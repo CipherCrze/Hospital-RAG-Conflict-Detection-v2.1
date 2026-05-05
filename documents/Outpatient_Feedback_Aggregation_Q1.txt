@@ -1,0 +1,93 @@
+OUTPATIENT SERVICES — PATIENT FEEDBACK AGGREGATION REPORT
+Q1 2025 (January — March 2025)
+Prepared by: Outpatient Department Administration
+Date: 09 April 2025
+Classification: Internal
+
+─────────────────────────────────────────────────────────────────────────────
+OVERVIEW
+─────────────────────────────────────────────────────────────────────────────
+This report aggregates feedback collected via paper-based feedback forms
+distributed at the Outpatient Department (OPD) exit points during Q1 2025.
+A total of 1,247 feedback forms were collected and analysed. The OPD feedback
+instrument differs from the Quality Department's Patient Satisfaction Survey
+in both methodology and patient population, and results should not be compared
+directly with PSI scores without adjustment.
+
+─────────────────────────────────────────────────────────────────────────────
+AGGREGATE SCORES — Q1 2025
+─────────────────────────────────────────────────────────────────────────────
+Dimension                         Q4 2024   Q1 2025   Change   Rating
+─────────────────────────────────────────────────────────────────────────────
+Registration Speed                  3.8       4.1      +8.0%   Good
+Doctor Consultation Time            4.2       4.4      +4.8%   Very Good
+Pharmacy Wait Time                  3.4       3.6      +5.9%   Good
+Diagnostic (Lab/X-ray) Wait Time    3.5       3.3      -5.7%   Average
+Follow-up Appointment Ease          3.7       3.8      +2.7%   Good
+Overall OPD Experience              3.9       4.0      +2.6%   Good
+─────────────────────────────────────────────────────────────────────────────
+(Scale: 1=Very Poor, 2=Poor, 3=Average, 4=Good, 5=Very Good)
+
+─────────────────────────────────────────────────────────────────────────────
+TREND ANALYSIS
+─────────────────────────────────────────────────────────────────────────────
+Overall OPD satisfaction shows a modest improvement of 2.6% compared to Q4
+2024. The improvement is narrow and within the statistical margin of error
+for this sample size. Declining satisfaction in diagnostic wait times
+(laboratory and radiology) is a concern and warrants investigation.
+
+Registration and consultation experience improvements align with the recent
+deployment of the digital token management system in January 2025. Pharmacy
+wait times remain a known bottleneck, though the slight improvement suggests
+incremental progress.
+
+─────────────────────────────────────────────────────────────────────────────
+OPEN-ENDED FEEDBACK THEMES
+─────────────────────────────────────────────────────────────────────────────
+Positive themes (frequency > 50 mentions):
+- "Doctors are attentive and explain clearly" (182 mentions)
+- "Registration process is faster than before" (134 mentions)
+- "Cleaner than I remember" (98 mentions)
+- "Nursing staff are helpful" (87 mentions)
+
+Negative themes (frequency > 50 mentions):
+- "Lab results take too long" (201 mentions — highest frequency)
+- "Pharmacy queue is very long" (156 mentions)
+- "Air conditioning not working in waiting area — Block B" (74 mentions)
+- "Parking is inadequate" (63 mentions)
+
+─────────────────────────────────────────────────────────────────────────────
+EMERGENCY DEPARTMENT REFERRALS FROM OPD
+─────────────────────────────────────────────────────────────────────────────
+18 OPD patients were referred to the Emergency Department during Q1 2025.
+Of the 11 patients who provided feedback post-ED referral, 8 (72%) reported
+an unsatisfactory experience in the ED, citing long wait times and insufficient
+nursing staff. This finding is consistent with the ED complaint data for the
+same period and with the nursing shift logs reporting understaffing in February
+and March 2025.
+
+─────────────────────────────────────────────────────────────────────────────
+COMPARISON WITH Q1 PATIENT SATISFACTION SURVEY
+─────────────────────────────────────────────────────────────────────────────
+The Q1 Patient Satisfaction Survey (Quality Department) reports a 20% overall
+improvement in the hospital-wide PSI. The OPD feedback aggregation, which
+uses a different instrument and primarily measures OPD-specific experience,
+shows only a 2.6% improvement in overall OPD satisfaction. The large difference
+is likely attributable to the change in PSI weighting methodology introduced
+in January 2025 rather than an actual 20% improvement in patient experience.
+Administrators should interpret the satisfaction survey's 20% headline figure
+with caution and reference the methodology note in that report.
+
+─────────────────────────────────────────────────────────────────────────────
+RECOMMENDATIONS
+─────────────────────────────────────────────────────────────────────────────
+1. Prioritise radiology and laboratory capacity assessment to address
+   declining diagnostic wait time scores.
+2. Escalate the Block B air-conditioning issue to Facilities Management.
+3. Align OPD feedback instrument with the Quality Department's PSI methodology
+   to enable meaningful cross-instrument comparison in future quarters.
+4. Investigate the ED patient experience following OPD referrals — the 72%
+   unsatisfactory rate in the ED referral cohort is a significant finding.
+
+Prepared by: Outpatient Department Administration Officer
+Date: 09 April 2025

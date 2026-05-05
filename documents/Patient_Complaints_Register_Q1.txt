@@ -1,0 +1,93 @@
+PATIENT COMPLAINTS REGISTER — Q1 2025 ANALYSIS REPORT
+Period Covered: 01 January 2025 — 31 March 2025
+Prepared by: Patient Relations Department
+Report Date: 09 April 2025
+Classification: Internal — Complaints and Grievances
+Total Complaints Received in Q1 2025: 312
+
+─────────────────────────────────────────────────────────────────────────────
+OVERVIEW
+─────────────────────────────────────────────────────────────────────────────
+The Patient Relations Department received 312 formal complaints during Q1 2025.
+This represents a 25% increase over Q4 2024 (249 complaints) and is the
+highest quarterly complaint volume since Q1 2023. The increase is concentrated
+in two categories: Emergency Department wait times and nursing staff availability.
+
+─────────────────────────────────────────────────────────────────────────────
+COMPLAINT CATEGORY BREAKDOWN
+─────────────────────────────────────────────────────────────────────────────
+Category                            Q4 2024    Q1 2025    Change
+─────────────────────────────────────────────────────────────────────────────
+ED Wait Time / Triage Delay           41         89        +117%
+Nursing Availability / Responsiveness 28         67        +139%
+Communication (Doctor/Nurse)          42         45         +7%
+Cleanliness and Hygiene               19         12        -37%
+Discharge Delays                      31         33         +6%
+Medication Errors or Concerns         18         21        +17%
+Food and Facilities                   22         18        -18%
+Other / Miscellaneous                 48         27        -44%
+─────────────────────────────────────────────────────────────────────────────
+TOTAL                                249        312        +25%
+
+─────────────────────────────────────────────────────────────────────────────
+EMERGENCY DEPARTMENT COMPLAINTS — DETAILED ANALYSIS
+─────────────────────────────────────────────────────────────────────────────
+The Emergency Department accounted for 89 wait-time complaints in Q1 2025,
+more than double the Q4 2024 figure of 41. This sharp rise is directly
+correlated with the deterioration in ED operational conditions from February
+2025 onwards (extended nurse leave, agency staff deployment, supply shortages).
+
+Representative complaint excerpts from the ED category:
+"We waited 55 minutes before anyone spoke to us. The department looked
+overwhelmed and understaffed." — Patient, February 2025
+
+"I understand hospitals are busy but the triage nurse told us they were
+short-staffed that day. A patient next to us left without being seen."
+— Family member, March 2025
+
+"Wait times seem to have gotten significantly worse compared to our visit
+in December. Not sure why." — Returning patient, March 2025
+
+─────────────────────────────────────────────────────────────────────────────
+NURSING AVAILABILITY COMPLAINTS
+─────────────────────────────────────────────────────────────────────────────
+Nursing availability complaints (67 in Q1) are the second-largest driver of
+the overall increase. These complaints are concentrated in February and March
+and specifically relate to response times to call-button activations and
+delays in medication administration due to high workload.
+
+ED complaint volume rose by 25% in Q1 compared to Q4. The pattern is
+inconsistent with the Patient Satisfaction Survey report which indicates an
+overall satisfaction improvement of 20% for the same period. The Patient
+Relations Department notes that formal complaint registration and
+satisfaction survey responses may capture different segments of patient
+experience, but the magnitude of the discrepancy warrants investigation.
+
+─────────────────────────────────────────────────────────────────────────────
+POSITIVE OBSERVATIONS
+─────────────────────────────────────────────────────────────────────────────
+Complaints related to cleanliness and hygiene decreased by 37%, reflecting the
+effectiveness of the infection control programme. Food and facilities complaints
+also declined. These positive signals are consistent with the satisfaction
+survey findings in those domains.
+
+─────────────────────────────────────────────────────────────────────────────
+RESOLUTION STATUS
+─────────────────────────────────────────────────────────────────────────────
+Of the 312 complaints received:
+- 287 (92%) were formally acknowledged within 72 hours (SLA target: 90%)
+- 241 (77%) were resolved and closed within 30 days (SLA target: 75%)
+- 71 (23%) remain under investigation or pending resolution at report date
+
+─────────────────────────────────────────────────────────────────────────────
+RECOMMENDATIONS TO HOSPITAL BOARD
+─────────────────────────────────────────────────────────────────────────────
+1. Commission a root-cause investigation into the February–March ED complaint
+   surge, with specific focus on staffing levels and supply chain readiness.
+2. Review the disconnect between satisfaction survey scores and formal
+   complaint data to ensure measurement instruments are complementary.
+3. Implement mandatory complaint trend reporting to the Hospital Board on a
+   monthly basis (currently quarterly).
+
+Prepared by: Head of Patient Relations Department
+Reviewed by: Hospital Quality Committee Secretariat

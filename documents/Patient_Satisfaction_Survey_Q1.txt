@@ -1,0 +1,72 @@
+PATIENT SATISFACTION SURVEY — Q1 2025 RESULTS REPORT
+Survey Period: January 2025 — March 2025
+Sample Size: 840 respondents across inpatient and outpatient services
+Administered by: Quality and Patient Experience Department
+Report Date: 07 April 2025
+Classification: Internal
+
+─────────────────────────────────────────────────────────────────────────────
+EXECUTIVE SUMMARY
+─────────────────────────────────────────────────────────────────────────────
+The Q1 2025 Patient Satisfaction Survey shows a broadly positive picture of
+patient experience across the hospital. The overall Patient Satisfaction Index
+(PSI) for Q1 2025 is 78.4 (out of 100), compared to a Q4 2024 PSI of 65.3.
+This represents an improvement of 20.1% — the largest single-quarter
+improvement since the PSI instrument was introduced in 2021.
+
+─────────────────────────────────────────────────────────────────────────────
+DOMAIN SCORES
+─────────────────────────────────────────────────────────────────────────────
+Overall Communication (Doctor–Patient): 84.1 / 100 (Q4: 79.2) ↑ 6.2%
+Nursing Care Quality:                   81.7 / 100 (Q4: 78.0) ↑ 4.7%
+Cleanliness and Hygiene:               89.2 / 100 (Q4: 82.6) ↑ 8.0%
+Waiting Time Experience:               62.3 / 100 (Q4: 59.8) ↑ 4.2%
+Food and Facilities:                   73.5 / 100 (Q4: 70.1) ↑ 4.9%
+Discharge Process:                     77.8 / 100 (Q4: 74.3) ↑ 4.7%
+
+Patient satisfaction trended upward through Q1 with improvements observed
+across all six measured domains. The surge in the overall PSI is partly
+attributable to a revised weighting methodology introduced in January 2025
+that gives greater weight to communication and nursing care scores.
+
+─────────────────────────────────────────────────────────────────────────────
+EMERGENCY DEPARTMENT SPECIFIC FINDINGS
+─────────────────────────────────────────────────────────────────────────────
+The Emergency Department satisfaction subscore for Q1 2025 is 71.2 / 100,
+an improvement from the Q4 2024 subscore of 63.8 / 100 (a rise of 11.6%).
+Respondents in the ED category rated nursing attentiveness and communication
+positively, with 68% rating their ED experience as "Good" or "Excellent".
+
+Note: ED satisfaction data was collected primarily in January and early
+February. Survey administration in the ED was paused from mid-February due
+to staffing pressures; the ED subscore therefore reflects a truncated sample
+and may not fully represent the Q1 experience for ED patients.
+
+─────────────────────────────────────────────────────────────────────────────
+METHODOLOGY NOTE
+─────────────────────────────────────────────────────────────────────────────
+The PSI improvement from 65.3 to 78.4 reflects both genuine improvements in
+patient care and the change in weighting methodology. Under the previous
+(Q4 2024) weighting, the Q1 score would be approximately 69.8, representing
+a more modest improvement of approximately 7%. The Finance Department's
+reference to a 20% improvement in satisfaction in the Q1 Financial Summary
+corresponds to the new weighting methodology and is directionally correct.
+
+─────────────────────────────────────────────────────────────────────────────
+LIMITATIONS
+─────────────────────────────────────────────────────────────────────────────
+This survey captures self-reported satisfaction and does not capture
+complaints formally lodged through the Patient Relations Department. The
+Patient Complaints Register should be reviewed alongside this report for
+a complete picture of patient experience in Q1 2025.
+
+─────────────────────────────────────────────────────────────────────────────
+RECOMMENDATIONS
+─────────────────────────────────────────────────────────────────────────────
+1. Restore ED survey administration in Q2, with particular focus on patients
+   presenting in February and March when staffing pressures were highest.
+2. Investigate the gap between high survey satisfaction scores and the
+   significant increase in formal complaints recorded in Q1 (see Complaints
+   Register for details).
+
+Prepared by: Quality and Patient Experience Department
