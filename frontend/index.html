@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hospital RAG Dashboard</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">Hospital RAG</div>
+    <nav class="sidebar-nav">
+      <a id="nav-dashboard" class="active" onclick="showPage('dashboard')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+        Dashboard
+      </a>
+      <a id="nav-documents" onclick="showPage('documents')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="1" width="10" height="13" rx="1"/><line x1="4.5" y1="5" x2="10.5" y2="5"/><line x1="4.5" y1="8" x2="10.5" y2="8"/><line x1="4.5" y1="11" x2="8" y2="11"/></svg>
+        Documents
+      </a>
+      <a id="nav-query" onclick="showPage('query')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>
+        Query &amp; Analysis
+      </a>
+      <a id="nav-settings" onclick="showPage('settings')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41"/></svg>
+        Settings
+      </a>
+    </nav>
+
+    <div class="section-label">Active Profile</div>
+    <div class="profile-badge">
+      <div class="badge-initials" id="badge-initials" style="background:#7B5EA7">AD</div>
+      <div>
+        <div class="badge-name" id="badge-name">Administration</div>
+        <div class="badge-sub">Hospital RAG v2.0</div>
+      </div>
+    </div>
+
+    <div class="section-label">Switch Profile</div>
+    <div class="dept-grid">
+      <div class="dept-btn ed" onclick="switchProfile('ED','Emergency Dept','#D94F3D')"><div class="dept-code">ED</div><div class="dept-name">Emergency</div></div>
+      <div class="dept-btn fn" onclick="switchProfile('FN','Finance','#607080')"><div class="dept-code">FN</div><div class="dept-name">Finance</div></div>
+      <div class="dept-btn ad active" onclick="switchProfile('AD','Administration','#7B5EA7')"><div class="dept-code">AD</div><div class="dept-name">Admin</div></div>
+      <div class="dept-btn qx" onclick="switchProfile('QX','Quality &amp; Patient Exp.','#2E9E6B')"><div class="dept-code">QX</div><div class="dept-name">Quality</div></div>
+      <div class="dept-btn ic" onclick="switchProfile('IC','Infection Control','#E09B2D')"><div class="dept-code">IC</div><div class="dept-name">Infection</div></div>
+      <div class="dept-btn sg" onclick="switchProfile('SG','Surgical','#4DB8FF')"><div class="dept-code">SG</div><div class="dept-name">Surgical</div></div>
+    </div>
+
+    <div class="api-section">
+      <div class="api-label">Gemini 2.5 Flash API Key</div>
+      <input class="api-input" id="api-key-input" type="password" placeholder="AIza…"/>
+      <button class="api-apply" onclick="applyKey()">Apply Key</button>
+      <div class="api-status" id="api-status"></div>
+    </div>
+
+    <div style="padding:8px 12px 4px">
+      <div class="api-label" style="margin-bottom:4px">Theme</div>
+      <div class="theme-row" style="padding:0">
+        <button class="theme-btn active" id="theme-dark" onclick="setTheme('dark')">Dark</button>
+        <button class="theme-btn" id="theme-light" onclick="setTheme('light')">Light</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="main-inner">
+
+      <!-- DASHBOARD -->
+      <div id="page-dashboard">
+        <div class="main-header">
+          <div class="main-title">Dashboard</div>
+          <div class="main-sub">Hospital intelligence overview — Q1 2025</div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card chunks"><div class="stat-value" id="stat-chunks">—</div><div class="stat-label">Indexed Chunks</div></div>
+          <div class="stat-card queries"><div class="stat-value" id="stat-queries">0</div><div class="stat-label">Queries Run</div></div>
+          <div class="stat-card conflicts"><div class="stat-value" id="stat-conflicts">0</div><div class="stat-label">Conflicts Found</div></div>
+          <div class="stat-card confidence"><div class="stat-value" id="stat-conf">—</div><div class="stat-label">Avg Confidence</div></div>
+        </div>
+        <div class="bottom-grid">
+          <div>
+            <div class="section-title">Recent Queries</div>
+            <div id="recent-queries-list">
+              <div class="empty-state">No queries yet. Head to Query &amp; Analysis to get started.</div>
+            </div>
+          </div>
+          <div>
+            <div class="section-title">Quick Actions</div>
+            <button class="action-btn" onclick="showPage('query')">+ New Query</button>
+            <button class="action-btn" onclick="showPage('documents')">Manage Documents</button>
+            <button class="action-btn" onclick="showPage('settings')">Settings</button>
+            <div class="section-title" style="margin-top:18px">Active Profile</div>
+            <div class="active-profile-card">
+              <div class="active-profile-name"><span class="active-indicator"></span><span id="active-profile-name">Administration</span></div>
+              <div class="active-profile-sub">Hospital RAG v2.0 · Q1 2025</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUERY -->
+      <div id="page-query" style="display:none">
+        <div class="main-header">
+          <div class="main-title">Query &amp; Analysis</div>
+          <div class="main-sub">Run queries across indexed hospital documents — conflicts detected automatically</div>
+        </div>
+        <div class="content-panel" style="margin-bottom:20px">
+          <div class="panel-header"><span class="panel-title">New Query</span></div>
+          <div class="query-form">
+            <textarea class="query-textarea" id="query-input" placeholder="Ask a question about your indexed documents…"></textarea>
+            <button class="query-submit" id="query-btn" onclick="runQuery()">Run Query</button>
+          </div>
+        </div>
+        <div id="query-result"></div>
+        <div class="section-title" style="margin-top:20px">Query History</div>
+        <div class="content-panel" id="query-history-panel">
+          <div class="empty-state" id="query-empty">No queries yet.</div>
+        </div>
+      </div>
+
+      <!-- DOCUMENTS -->
+      <div id="page-documents" style="display:none">
+        <div class="main-header">
+          <div class="main-title">Documents</div>
+          <div class="main-sub">Manage indexed hospital knowledge base</div>
+        </div>
+        <div class="upload-zone" onclick="document.getElementById('file-upload').click()">
+          Click to upload documents (PDF, TXT, DOCX)
+          <input type="file" id="file-upload" multiple accept=".pdf,.txt,.docx" style="display:none" onchange="uploadFiles(this.files)">
+        </div>
+        <div class="content-panel">
+          <div class="panel-header">
+            <span class="panel-title">Indexed Files</span>
+            <span style="font-size:12px;color:#3A5468" id="doc-chunk-count"></span>
+          </div>
+          <div id="doc-list"><div class="empty-state">Loading documents…</div></div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div id="page-settings" style="display:none">
+        <div class="main-header">
+          <div class="main-title">Settings</div>
+          <div class="main-sub">Configure your Hospital RAG environment</div>
+        </div>
+        <div class="content-panel">
+          <div class="settings-section">
+            <div class="settings-label">API Configuration</div>
+            <div class="settings-row"><span>Gemini 2.5 Flash API Key</span></div>
+            <input class="settings-input" id="settings-key" type="password" placeholder="AIza…"/>
+            <button class="api-apply" style="margin-top:8px;width:auto;padding:6px 16px" onclick="applyKeyFromSettings()">Apply</button>
+          </div>
+          <div class="settings-section">
+            <div class="settings-label">Retrieval Parameters</div>
+            <div class="settings-row"><span>Top-K Chunks</span><span id="topk-label" style="font-family:'DM Mono',monospace;font-size:12px;color:#4DB8FF">8</span></div>
+            <input type="range" min="4" max="16" step="1" value="8" style="width:100%;margin-top:4px;accent-color:#4DB8FF" oninput="document.getElementById('topk-label').textContent=this.value">
+            <div class="settings-row" style="margin-top:12px"><span>NLI Threshold</span><span id="nli-label" style="font-family:'DM Mono',monospace;font-size:12px;color:#4DB8FF">0.65</span></div>
+            <input type="range" min="0.4" max="0.9" step="0.05" value="0.65" style="width:100%;margin-top:4px;accent-color:#4DB8FF" oninput="document.getElementById('nli-label').textContent=parseFloat(this.value).toFixed(2)">
+          </div>
+          <div class="settings-section">
+            <div class="settings-label">Query Preferences</div>
+            <div class="settings-row"><span>Enable conflict detection</span><div class="toggle-pill" onclick="this.classList.toggle('off')"></div></div>
+            <div class="settings-row"><span>Show confidence scores</span><div class="toggle-pill" onclick="this.classList.toggle('off')"></div></div>
+            <div class="settings-row"><span>Auto-index on upload</span><div class="toggle-pill off" onclick="this.classList.toggle('off')"></div></div>
+          </div>
+          <div class="settings-section" style="border-bottom:none">
+            <div class="settings-label">Theme</div>
+            <div class="theme-row" style="padding:0">
+              <button class="theme-btn active" id="s-theme-dark" onclick="setTheme('dark')">Dark</button>
+              <button class="theme-btn" id="s-theme-light" onclick="setTheme('light')">Light</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const API = '';
+var queries=[], qCount=0, conflictCount=0, confSum=0;
+
+// ── Navigation ──────────────────────────────────────────────────────
+function showPage(p){
+  ['dashboard','query','documents','settings'].forEach(function(id){
+    document.getElementById('page-'+id).style.display=id===p?'':'none';
+    var nav=document.getElementById('nav-'+id);
+    if(nav) nav.className=id===p?'active':'';
+  });
+  if(p==='documents') loadDocuments();
+}
+
+// ── Profile switcher ────────────────────────────────────────────────
+function switchProfile(code,name,color){
+  document.querySelectorAll('.dept-btn').forEach(function(b){b.classList.remove('active');});
+  var map={ED:'ed',FN:'fn',AD:'ad',QX:'qx',IC:'ic',SG:'sg'};
+  var el=document.querySelector('.dept-btn.'+map[code]);
+  if(el) el.classList.add('active');
+  var bi=document.getElementById('badge-initials');
+  bi.textContent=code; bi.style.background=color;
+  document.getElementById('badge-name').textContent=name;
+  document.getElementById('active-profile-name').textContent=name;
+}
+
+// ── API Key ─────────────────────────────────────────────────────────
+function applyKey(){
+  var k=document.getElementById('api-key-input').value.trim();
+  if(!k){document.getElementById('api-status').textContent='Enter a key first';document.getElementById('api-status').className='api-status err';return;}
+  localStorage.setItem('hrag_key',k);
+  fetch(API+'/api/config/key',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({api_key:k})})
+    .then(function(r){return r.json();})
+    .then(function(){
+      var s=document.getElementById('api-status');
+      s.textContent=k.substring(0,8)+'············ connected';
+      s.className='api-status ok';
+    }).catch(function(){
+      var s=document.getElementById('api-status');
+      s.textContent=k.substring(0,8)+'············ (offline mode)';
+      s.className='api-status ok';
+    });
+}
+function applyKeyFromSettings(){
+  var k=document.getElementById('settings-key').value.trim();
+  if(k){document.getElementById('api-key-input').value=k;applyKey();}
+}
+
+// ── Run Query ───────────────────────────────────────────────────────
+function runQuery(){
+  var text=document.getElementById('query-input').value.trim();
+  if(!text)return;
+  var btn=document.getElementById('query-btn');
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span>Analyzing…';
+  document.getElementById('query-result').innerHTML='';
+
+  var key=localStorage.getItem('hrag_key')||document.getElementById('api-key-input').value.trim();
+
+  fetch(API+'/api/query',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({question:text,api_key:key,top_k:8})
+  }).then(function(r){return r.json();})
+  .then(function(data){
+    btn.disabled=false;btn.innerHTML='Run Query';
+    qCount++;
+    var conf=Math.round((data.confidence||0.85)*100);
+    confSum+=conf;
+    var hasConflict=data.conflict_report&&data.conflict_report.conflict_count>0;
+    if(hasConflict) conflictCount++;
+    queries.unshift({text:text,conf:conf,hasConflict:hasConflict,ts:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});
+    updateStats();
+    renderResult(data,text,conf,hasConflict);
+    renderHistory();
+    document.getElementById('query-input').value='';
+  }).catch(function(e){
+    btn.disabled=false;btn.innerHTML='Run Query';
+    document.getElementById('query-result').innerHTML=
+      '<div class="conflict-box"><strong>Error:</strong> '+e.message+'<br>Check API key and backend connection.</div>';
+  });
+}
+
+function renderResult(data,text,conf,hasConflict){
+  var cr=data.conflict_report||{};
+  var html='<div class="content-panel"><div class="panel-header"><span class="panel-title">Result</span>'
+    +'<span class="query-badge">'+conf+'% confidence</span></div>'
+    +'<div style="padding:16px">';
+
+  if(data.answer){
+    html+='<div class="answer-box">'+escHtml(data.answer)+'</div>';
+  }
+  if(hasConflict){
+    html+='<div class="conflict-box" style="margin-top:12px"><strong>'+cr.conflict_count+' conflict(s) detected</strong>'
+      +' across '+cr.total_pairs+' chunk pairs ('+Math.round((cr.conflict_ratio||0)*100)+'% ratio)<br>';
+    (cr.conflicts||[]).forEach(function(c,i){
+      html+='<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,92,92,.15)">'
+        +'<strong>Conflict '+(i+1)+':</strong> '+escHtml(c.chunk_a.substring(0,120))+'…<br>'
+        +'<em style="color:#7A9BB5">vs.</em> '+escHtml(c.chunk_b.substring(0,120))+'…</div>';
+    });
+    html+='</div>';
+  } else if(data.conflict_report){
+    html+='<div class="resolution-box" style="margin-top:12px">No conflicting evidence detected.</div>';
+  }
+
+  if(data.sources&&data.sources.length){
+    html+='<div style="margin-top:12px;font-size:11px;color:#3A5468">Sources: '
+      +data.sources.map(function(s){return '<code style="background:#0A0F14;color:#4DB8FF;padding:1px 5px;border-radius:3px">'+escHtml(s.source)+'</code>';}).join(' ')
+      +'</div>';
+  }
+  html+='</div></div>';
+  document.getElementById('query-result').innerHTML=html;
+}
+
+function renderHistory(){
+  var hp=document.getElementById('query-history-panel');
+  var empty=document.getElementById('query-empty');
+  if(empty) empty.style.display='none';
+  var items=queries.slice(0,20).map(function(q){
+    return '<div class="query-item"><span style="flex:1;margin-right:12px">'
+      +escHtml(q.text.substring(0,60))+(q.text.length>60?'…':'')+'</span>'
+      +'<span class="query-badge'+(q.hasConflict?' conflict-badge':'')+'">'+q.conf+'% · '+q.ts+'</span></div>';
+  }).join('');
+  hp.innerHTML=items||'<div class="empty-state">No queries yet.</div>';
+
+  // Update dashboard recent
+  var rl=document.getElementById('recent-queries-list');
+  if(queries.length){
+    rl.innerHTML='<div class="content-panel">'
+      +queries.slice(0,5).map(function(q){
+        return '<div class="query-item"><span style="flex:1">'+escHtml(q.text.substring(0,55))+(q.text.length>55?'…':'')+'</span>'
+          +'<span class="query-badge">'+q.ts+'</span></div>';
+      }).join('')+'</div>';
+  }
+}
+
+function updateStats(){
+  document.getElementById('stat-queries').textContent=qCount;
+  document.getElementById('stat-conflicts').textContent=conflictCount;
+  document.getElementById('stat-conf').textContent=qCount?Math.round(confSum/qCount)+'%':'—';
+}
+
+// ── Documents ───────────────────────────────────────────────────────
+function loadDocuments(){
+  fetch(API+'/api/documents')
+    .then(function(r){return r.json();})
+    .then(function(data){
+      var docs=data.documents||[];
+      var totalChunks=data.total_chunks||0;
+      document.getElementById('doc-chunk-count').textContent=totalChunks+' chunks';
+      if(!docs.length){document.getElementById('doc-list').innerHTML='<div class="empty-state">No documents indexed yet.</div>';return;}
+      document.getElementById('doc-list').innerHTML=docs.map(function(d){
+        return '<div class="doc-item"><span>'+escHtml(d.filename||d.name||d)+'</span>'
+          +'<span class="doc-badge">'+(d.chunks||'—')+' chunks</span></div>';
+      }).join('');
+    }).catch(function(){
+      document.getElementById('doc-list').innerHTML='<div class="empty-state">Could not load documents.</div>';
+    });
+}
+
+function uploadFiles(files){
+  if(!files.length)return;
+  var fd=new FormData();
+  Array.from(files).forEach(function(f){fd.append('files',f);});
+  var zone=document.querySelector('.upload-zone');
+  zone.textContent='Uploading…';
+  fetch(API+'/api/documents/upload',{method:'POST',body:fd})
+    .then(function(r){return r.json();})
+    .then(function(){zone.textContent='Upload complete. Click to upload more.';loadDocuments();})
+    .catch(function(){zone.textContent='Upload failed. Click to retry.';});
+}
+
+// ── Stats from backend ──────────────────────────────────────────────
+function loadStats(){
+  fetch(API+'/health').then(function(r){return r.json();}).then(function(d){
+    if(d.chunk_count!=null) document.getElementById('stat-chunks').textContent=d.chunk_count;
+  }).catch(function(){});
+  fetch(API+'/api/analytics/overview').then(function(r){return r.json();}).then(function(d){
+    if(d.total_chunks!=null) document.getElementById('stat-chunks').textContent=d.total_chunks;
+  }).catch(function(){});
+}
+
+// ── Theme ───────────────────────────────────────────────────────────
+var LIGHT_OVERRIDES={
+  '--bg':'#F4F7F9','--surface':'#FFFFFF','--border':'#DDE4EA',
+  '--text':'#1C2B36','--muted':'#607080','--accent':'#1A6FA8',
+  '--green':'#2E9E6B','--red':'#D94F3D','--amber':'#E09B2D'
+};
+function setTheme(t){
+  var root=document.documentElement;
+  if(t==='light'){
+    document.body.style.background='#F4F7F9';
+    document.querySelector('.app').style.background='#F4F7F9';
+    document.querySelector('.app').style.color='#1C2B36';
+    document.querySelector('.sidebar').style.background='#FFFFFF';
+    document.querySelector('.sidebar').style.borderRightColor='#DDE4EA';
+    document.querySelectorAll('.stat-card,.content-panel,.dept-btn,.active-profile-card,.action-btn').forEach(function(el){
+      el.style.background='#FFFFFF';el.style.borderColor='#DDE4EA';
+    });
+    document.querySelector('.main').style.background='#F4F7F9';
+    document.querySelectorAll('.query-textarea,.api-input,.settings-input').forEach(function(el){
+      el.style.background='#F4F7F9';el.style.borderColor='#DDE4EA';el.style.color='#1C2B36';
+    });
+  } else {
+    location.reload();
+  }
+  ['dark','light'].forEach(function(id){
+    document.getElementById('theme-'+id).className='theme-btn'+(id===t?' active':'');
+    var s=document.getElementById('s-theme-'+id);
+    if(s) s.className='theme-btn'+(id===t?' active':'');
+  });
+}
+
+function escHtml(t){
+  return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── Init ────────────────────────────────────────────────────────────
+window.onload=function(){
+  var saved=localStorage.getItem('hrag_key');
+  if(saved){
+    document.getElementById('api-key-input').value=saved;
+    document.getElementById('api-status').textContent=saved.substring(0,8)+'············ connected';
+    document.getElementById('api-status').className='api-status ok';
+    fetch(API+'/api/config/key',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({api_key:saved})}).catch(function(){});
+  }
+  loadStats();
+};
+</script>
+</body>
+</html>
