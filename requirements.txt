@@ -4,11 +4,12 @@
 #
 # Note: torch is the CPU-only build (~700 MB vs ~2.5 GB for CUDA build)
 # Install separately: pip install torch==2.3.0 --index-url https://download.pytorch.org/whl/cpu
+--extra-index-url https://download.pytorch.org/whl/cpu
 
 # Core ML / NLP
 sentence-transformers==2.7.0
 transformers==4.41.2
-torch==2.3.0
+torch>=2.9.0
 
 # Vector Database
 chromadb==0.5.3
