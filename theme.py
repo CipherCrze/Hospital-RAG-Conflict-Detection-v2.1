@@ -136,5 +136,5 @@ html, body, [data-testid="stAppViewContainer"], .stApp {
 }
 </style>"""
 
-def inject():
+def inject(theme=None):
     return CSS
