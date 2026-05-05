@@ -1,84 +1,72 @@
-"""pages/pg_dashboard.py — Overview page using clinical design system."""
+"""pages/pg_dashboard.py — Dashboard page with exact UI"""
 import streamlit as st
-from datetime import datetime
 
-
-def render(vs, theme):
+def render(vs):
     qs = st.session_state.get("query_history", [])
     chunks = 0
     if vs:
         try: chunks = vs._collection.count()
         except: pass
 
-    # ── Header ────────────────────────────────────────────────────────
-    st.markdown('<div class="page-title">Dashboard</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-sub">Hospital intelligence overview — Q1 2025</div>', unsafe_allow_html=True)
-
-    # ── Stat cards ────────────────────────────────────────────────────
     n_conflicts = sum(1 for q in qs if q.get("has_conflicts"))
     avg_conf = f"{sum(q.get('confidence',0) for q in qs)/len(qs):.0f}%" if qs else "—"
+    
+    st.markdown("""
+    <div class="main-inner">
+      <div class="main-header">
+        <div class="main-title">Dashboard</div>
+        <div class="main-sub">Hospital intelligence overview — Q1 2025</div>
+      </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown(f"""
+      <div class="stats-grid">
+        <div class="stat-card chunks"><div class="stat-value">{chunks}</div><div class="stat-label">Indexed Chunks</div></div>
+        <div class="stat-card queries"><div class="stat-value">{len(qs)}</div><div class="stat-label">Queries Run</div></div>
+        <div class="stat-card conflicts"><div class="stat-value">{n_conflicts}</div><div class="stat-label">Conflicts Found</div></div>
+        <div class="stat-card confidence"><div class="stat-value">{avg_conf}</div><div class="stat-label">Avg Confidence</div></div>
+      </div>
+    """, unsafe_allow_html=True)
 
-    c1, c2, c3, c4 = st.columns(4)
-    for col, val, lbl, cls in [
-        (c1, chunks,      "Indexed Chunks",  "stat-blue"),
-        (c2, len(qs),     "Queries Run",     "stat-green"),
-        (c3, n_conflicts, "Conflicts Found",  "stat-red"),
-        (c4, avg_conf,    "Avg Confidence",  "stat-amber"),
-    ]:
-        with col:
-            st.markdown(
-                f'<div class="stat-card {cls}">'
-                f'<div class="stat-value">{val}</div>'
-                f'<div class="stat-label">{lbl}</div></div>',
-                unsafe_allow_html=True,
-            )
-
-    st.markdown("<div style='margin-bottom:1.4rem'></div>", unsafe_allow_html=True)
-
-    # ── Bottom grid ───────────────────────────────────────────────────
-    col_l, col_r = st.columns([3, 1], gap="large")
-
-    with col_l:
+    # We need to split into 2 columns for bottom grid because Streamlit doesn't easily let us overlay buttons inside pure HTML without breaking the layout,
+    # BUT we can just use Streamlit's columns and apply the exact CSS layout!
+    # Or, we can use the same overlay trick we used in the sidebar.
+    
+    col1, col2 = st.columns([1, 0.4], gap="medium")
+    
+    with col1:
         st.markdown('<div class="section-title">Recent Queries</div>', unsafe_allow_html=True)
         if not qs:
-            st.markdown(
-                '<div class="content-panel"><div class="empty-state">'
-                'No queries yet. Head to Query &amp; Analysis to get started.'
-                '</div></div>',
-                unsafe_allow_html=True,
-            )
+            st.markdown('<div class="content-panel"><div class="empty-state">No queries yet. Head to Query & Analysis to get started.</div></div>', unsafe_allow_html=True)
         else:
             items = "".join(
                 f'<div class="query-item">'
-                f'<span style="flex:1;margin-right:12px">{q["question"][:65]}{"…" if len(q["question"])>65 else ""}</span>'
-                f'<span class="conf-badge">{q.get("confidence",0):.0f}% · {q.get("ts","")}</span>'
+                f'<span style="flex:1">{q["question"][:65]}{"…" if len(q["question"])>65 else ""}</span>'
+                f'<span class="query-badge">{q.get("confidence",0):.0f}% · {q.get("ts","")}</span>'
                 f'</div>'
                 for q in reversed(qs[-8:])
             )
-            st.markdown(
-                f'<div class="content-panel"><div class="panel-header">'
-                f'<span class="panel-title">History</span>'
-                f'<span style="font-size:12px;color:#3A5468">{len(qs)} total</span>'
-                f'</div>{items}</div>',
-                unsafe_allow_html=True,
-            )
+            st.markdown(f'<div class="content-panel">{items}</div>', unsafe_allow_html=True)
 
-    with col_r:
+    with col2:
         st.markdown('<div class="section-title">Quick Actions</div>', unsafe_allow_html=True)
-        if st.button("New Query", use_container_width=True, key="dash_q", type="primary"):
-            st.session_state.page = "query"; st.rerun()
-        if st.button("Manage Documents", use_container_width=True, key="dash_d"):
-            st.session_state.page = "documents"; st.rerun()
+        
+        actions = [("query", "+ New Query"), ("documents", "Manage Documents"), ("settings", "Settings")]
+        for key, label in actions:
+            st.markdown(f'<div class="click-wrapper"><button class="action-btn">{label}</button></div>', unsafe_allow_html=True)
+            st.markdown('<div class="invisible-btn">', unsafe_allow_html=True)
+            if st.button(" ", key=f"dash_{key}", use_container_width=True):
+                st.session_state.page = key
+                st.rerun()
+            st.markdown('</div>', unsafe_allow_html=True)
+            
+        dept = st.session_state.get("active_dept", {"name": "Administration"})
+        st.markdown(f"""
+        <div class="section-title" style="margin-top:18px;">Active Profile</div>
+        <div class="active-profile-card">
+          <div class="active-profile-name"><span class="active-indicator"></span><span>{dept['name']}</span></div>
+          <div class="active-profile-sub">Hospital RAG v2.0 · Q1 2025</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-        dept = st.session_state.get("active_dept", {})
-        if dept:
-            st.markdown(
-                f'<div style="margin-top:1rem"><div class="section-title">Active Profile</div>'
-                f'<div class="content-panel" style="padding:12px 14px;">'
-                f'<div style="display:flex;align-items:center;gap:8px">'
-                f'<div style="width:8px;height:8px;border-radius:50%;background:{dept.get("hex","#00D68F")}"></div>'
-                f'<span style="font-size:13px;font-weight:600">{dept.get("full","—")}</span></div>'
-                f'<div style="font-size:11px;margin-top:4px;opacity:.55">Hospital RAG v2.0 · Q1 2025</div>'
-                f'</div></div>',
-                unsafe_allow_html=True,
-            )
+    st.markdown('</div>', unsafe_allow_html=True)
