@@ -1,0 +1,162 @@
+[
+  {
+    "id": "Q001",
+    "category": "multi_source_conflict",
+    "query": "How has patient satisfaction changed in Q1?",
+    "expected_conflict": true,
+    "conflicting_sources": ["Patient_Satisfaction_Survey_Q1.txt", "Patient_Complaints_Register_Q1.txt"],
+    "notes": "Core conflict query from report Section 5.4. Survey reports 20% improvement; complaints log shows 25% rise in ED complaints."
+  },
+  {
+    "id": "Q002",
+    "category": "multi_source_conflict",
+    "query": "What is the current ED budget status?",
+    "expected_conflict": true,
+    "conflicting_sources": ["Q1_Financial_Summary.txt", "ED_Nursing_Shift_Log_Q1.txt"],
+    "notes": "Finance reports 94.1% utilisation within budget; nursing log records 12% overspend on cash basis."
+  },
+  {
+    "id": "Q003",
+    "category": "single_source",
+    "query": "What were the Q1 nursing staff hours and overtime statistics?",
+    "expected_conflict": false,
+    "conflicting_sources": [],
+    "notes": "Primarily answered from ED_Nursing_Shift_Log_Q1.txt. No cross-source conflict expected."
+  },
+  {
+    "id": "Q004",
+    "category": "single_source",
+    "query": "Summarize outpatient feedback trends in Q1.",
+    "expected_conflict": false,
+    "conflicting_sources": [],
+    "notes": "Primarily answered from Outpatient_Feedback_Aggregation_Q1.txt. No conflict expected."
+  },
+  {
+    "id": "Q005",
+    "category": "multi_source_conflict",
+    "query": "What are the top complaint categories in Q1?",
+    "expected_conflict": true,
+    "conflicting_sources": ["Patient_Complaints_Register_Q1.txt", "Patient_Satisfaction_Survey_Q1.txt", "ED_Nursing_Shift_Log_Q1.txt"],
+    "notes": "Complaint categories from register conflict with satisfaction survey domain scores."
+  },
+  {
+    "id": "Q006",
+    "category": "multi_source_harmonic",
+    "query": "How has hospital cleanliness and hygiene performance changed?",
+    "expected_conflict": false,
+    "conflicting_sources": [],
+    "notes": "Both complaints log and satisfaction survey agree cleanliness improved — harmonic multi-source query."
+  },
+  {
+    "id": "Q007",
+    "category": "multi_source_conflict",
+    "query": "Were there any emergency procurement requests from the Emergency Department in Q1?",
+    "expected_conflict": true,
+    "conflicting_sources": ["Q1_Financial_Summary.txt", "ED_Nursing_Shift_Log_Q1.txt"],
+    "notes": "Finance says zero; nursing log records five emergency procurement requests."
+  },
+  {
+    "id": "Q008",
+    "category": "multi_source_harmonic",
+    "query": "How did the hospital perform in discharge process management?",
+    "expected_conflict": false,
+    "conflicting_sources": [],
+    "notes": "Discharge satisfaction improved and discharge delay complaints were minimal — harmonic."
+  },
+  {
+    "id": "Q009",
+    "category": "multi_source_conflict",
+    "query": "Give a complete overview of Q1 hospital performance.",
+    "expected_conflict": true,
+    "conflicting_sources": ["Q1_Financial_Summary.txt", "ED_Nursing_Shift_Log_Q1.txt", "Patient_Satisfaction_Survey_Q1.txt", "Patient_Complaints_Register_Q1.txt"],
+    "notes": "Broad query that pulls from all five documents, triggering multiple conflicts."
+  },
+  {
+    "id": "Q010",
+    "category": "multi_source_conflict",
+    "query": "How is the Emergency Department performing operationally and financially?",
+    "expected_conflict": true,
+    "conflicting_sources": ["Q1_Financial_Summary.txt", "ED_Nursing_Shift_Log_Q1.txt"],
+    "notes": "The central conflict in the project — Finance vs nursing log on ED budget and procurement."
+  },
+  {
+    "id": "Q011",
+    "category": "single_source",
+    "query": "What is the hospital's capital expenditure plan for Q2?",
+    "expected_conflict": false,
+    "conflicting_sources": [],
+    "notes": "Only in Financial Summary — CT scanner upgrade deferred to Q2."
+  },
+  {
+    "id": "Q012",
+    "category": "multi_source_conflict",
+    "query": "How did nursing availability and responsiveness trend in Q1?",
+    "expected_conflict": true,
+    "conflicting_sources": ["Patient_Satisfaction_Survey_Q1.txt", "Patient_Complaints_Register_Q1.txt", "ED_Nursing_Shift_Log_Q1.txt"],
+    "notes": "Survey shows nursing care improved; complaints show 139% rise in nursing availability complaints."
+  },
+  {
+    "id": "Q013",
+    "category": "ambiguous",
+    "query": "What is the hospital's planned budget for 2025-26?",
+    "expected_conflict": false,
+    "conflicting_sources": [],
+    "notes": "Ambiguous — documents only cover Q1 2025; no full-year budget information available."
+  },
+  {
+    "id": "Q014",
+    "category": "multi_source_conflict",
+    "query": "What do the satisfaction survey results show about patient experience?",
+    "expected_conflict": true,
+    "conflicting_sources": ["Patient_Satisfaction_Survey_Q1.txt", "Outpatient_Feedback_Aggregation_Q1.txt"],
+    "notes": "PSI shows 20.1% improvement while OPD instrument shows only 2.6% improvement."
+  },
+  {
+    "id": "Q015",
+    "category": "single_source",
+    "query": "What was the complaint resolution rate in Q1?",
+    "expected_conflict": false,
+    "conflicting_sources": [],
+    "notes": "Resolution rates (92% within 72 hours, 77% within 30 days) only in Complaints Register."
+  },
+  {
+    "id": "Q016",
+    "category": "multi_source_harmonic",
+    "query": "What improvements were made to the patient registration process?",
+    "expected_conflict": false,
+    "conflicting_sources": [],
+    "notes": "Both OPD feedback and satisfaction survey agree registration improved due to digital token system."
+  },
+  {
+    "id": "Q017",
+    "category": "multi_source_conflict",
+    "query": "How did ED wait times change over Q1?",
+    "expected_conflict": true,
+    "conflicting_sources": ["ED_Nursing_Shift_Log_Q1.txt", "Patient_Satisfaction_Survey_Q1.txt"],
+    "notes": "Nursing log records 24→41 minute increase; survey shows wait time satisfaction improved 4.2%."
+  },
+  {
+    "id": "Q018",
+    "category": "ambiguous",
+    "query": "What is the staff satisfaction level for Q1?",
+    "expected_conflict": false,
+    "conflicting_sources": [],
+    "notes": "Ambiguous — no staff satisfaction survey document in the collection. Partial info only."
+  },
+  {
+    "id": "Q019",
+    "category": "multi_source_harmonic",
+    "query": "What feedback was received about food and facilities?",
+    "expected_conflict": false,
+    "conflicting_sources": [],
+    "notes": "Both complaints (fewer) and satisfaction survey agree food/facilities improved — harmonic."
+  },
+  {
+    "id": "Q020",
+    "category": "ambiguous",
+    "query": "What is the infection control record for Q1?",
+    "expected_conflict": false,
+    "conflicting_sources": [],
+    "notes": "Ambiguous — only indirect references to hygiene/cleanliness in the five documents; no infection control report in this collection."
+  }
+]

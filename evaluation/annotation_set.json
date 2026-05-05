@@ -1,0 +1,452 @@
+[
+  {
+    "id": "A001",
+    "premise": "ED budget utilisation stood at 94.1%, well within acceptable thresholds.",
+    "hypothesis": "Emergency Department spending exceeded allocation by approximately 12%.",
+    "label": "contradiction",
+    "source_a": "Q1_Financial_Summary.txt",
+    "source_b": "ED_Nursing_Shift_Log_Q1.txt",
+    "note": "Finance uses accrual accounting; Nursing log uses cash-basis expenditure."
+  },
+  {
+    "id": "A002",
+    "premise": "The Finance Department confirms that no emergency procurement requests from ED were processed during Q1.",
+    "hypothesis": "The ED nursing supervisor formally submitted two emergency procurement requests to the Materials Management Department in February.",
+    "label": "contradiction",
+    "source_a": "Q1_Financial_Summary.txt",
+    "source_b": "ED_Nursing_Shift_Log_Q1.txt",
+    "note": "Direct factual contradiction on number of emergency procurement requests."
+  },
+  {
+    "id": "A003",
+    "premise": "Overall patient satisfaction improved by 20% compared to Q4 2024 benchmark.",
+    "hypothesis": "ED complaint volume rose by 25% in Q1 compared to Q4.",
+    "label": "contradiction",
+    "source_a": "Q1_Financial_Summary.txt",
+    "source_b": "Patient_Complaints_Register_Q1.txt",
+    "note": "Core contradiction identified in the project report Section 5.4."
+  },
+  {
+    "id": "A004",
+    "premise": "Patient satisfaction trended upward through Q1 with improvements observed across all six measured domains.",
+    "hypothesis": "Patient satisfaction in the ED showed a consistent decline following the February staffing changes.",
+    "label": "contradiction",
+    "source_a": "Patient_Satisfaction_Survey_Q1.txt",
+    "source_b": "ED_Nursing_Shift_Log_Q1.txt",
+    "note": "Survey shows improvement; nursing log records decline. Survey note acknowledges ED data was truncated."
+  },
+  {
+    "id": "A005",
+    "premise": "The Emergency Department satisfaction subscore for Q1 2025 is 71.2, an improvement from Q4 2024 subscore of 63.8.",
+    "hypothesis": "Patient satisfaction in the ED showed a consistent decline following the February staffing changes.",
+    "label": "contradiction",
+    "source_a": "Patient_Satisfaction_Survey_Q1.txt",
+    "source_b": "ED_Nursing_Shift_Log_Q1.txt",
+    "note": "ED subscore improvement vs nursing log reporting decline."
+  },
+  {
+    "id": "A006",
+    "premise": "Total agency nursing hours in Q1: 352 hours (budget: 112 hours).",
+    "hypothesis": "Agency nurse deployments during Q1 were minimal — 14 agency shifts totalling approximately 112 agency hours.",
+    "label": "contradiction",
+    "source_a": "ED_Nursing_Shift_Log_Q1.txt",
+    "source_b": "Q1_Financial_Summary.txt",
+    "note": "352 actual hours vs 112 hours stated in Finance report — direct numerical contradiction."
+  },
+  {
+    "id": "A007",
+    "premise": "The Q1 Patient Satisfaction Survey reports a 20% overall improvement in the hospital-wide PSI.",
+    "hypothesis": "The OPD feedback aggregation shows only a 2.6% improvement in overall OPD satisfaction.",
+    "label": "contradiction",
+    "source_a": "Patient_Satisfaction_Survey_Q1.txt",
+    "source_b": "Outpatient_Feedback_Aggregation_Q1.txt",
+    "note": "Different instruments give divergent satisfaction numbers."
+  },
+  {
+    "id": "A008",
+    "premise": "68% rating their ED experience as Good or Excellent.",
+    "hypothesis": "8 out of 11 (72%) ED referral patients reported an unsatisfactory experience in the ED.",
+    "label": "contradiction",
+    "source_a": "Patient_Satisfaction_Survey_Q1.txt",
+    "source_b": "Outpatient_Feedback_Aggregation_Q1.txt",
+    "note": "68% positive in survey vs 72% negative in OPD referral feedback."
+  },
+  {
+    "id": "A009",
+    "premise": "The overall Patient Satisfaction Index for Q1 2025 is 78.4, compared to Q4 2024 PSI of 65.3. This represents an improvement of 20.1%.",
+    "hypothesis": "Under the previous (Q4 2024) weighting, the Q1 score would be approximately 69.8, representing a more modest improvement of approximately 7%.",
+    "label": "neutral",
+    "source_a": "Patient_Satisfaction_Survey_Q1.txt",
+    "source_b": "Patient_Satisfaction_Survey_Q1.txt",
+    "note": "Same document acknowledging methodology change — neutral not contradiction."
+  },
+  {
+    "id": "A010",
+    "premise": "Complaints related to cleanliness and hygiene decreased by 37%.",
+    "hypothesis": "Cleanliness and Hygiene satisfaction improved 8.0% in Q1.",
+    "label": "entailment",
+    "source_a": "Patient_Complaints_Register_Q1.txt",
+    "source_b": "Patient_Satisfaction_Survey_Q1.txt",
+    "note": "Both agree cleanliness improved — entailment."
+  },
+  {
+    "id": "A011",
+    "premise": "The hospital closed Q1 2025 within budgetary parameters across all major cost centres.",
+    "hypothesis": "ED operating within its allocated budget.",
+    "label": "entailment",
+    "source_a": "Q1_Financial_Summary.txt",
+    "source_b": "Q1_Financial_Summary.txt",
+    "note": "Same document — consistent claim."
+  },
+  {
+    "id": "A012",
+    "premise": "The Patient Relations Department received 312 formal complaints during Q1 2025, a 25% increase over Q4 2024.",
+    "hypothesis": "Q4 2024 total complaints were 249.",
+    "label": "entailment",
+    "source_a": "Patient_Complaints_Register_Q1.txt",
+    "source_b": "Patient_Complaints_Register_Q1.txt",
+    "note": "Arithmetic consistent within the same document."
+  },
+  {
+    "id": "A013",
+    "premise": "Pharmacy wait times remain a known bottleneck, though the slight improvement suggests incremental progress.",
+    "hypothesis": "Pharmacy Wait Time improved from 3.4 to 3.6 in Q1.",
+    "label": "entailment",
+    "source_a": "Outpatient_Feedback_Aggregation_Q1.txt",
+    "source_b": "Outpatient_Feedback_Aggregation_Q1.txt",
+    "note": "Consistent within outpatient feedback document."
+  },
+  {
+    "id": "A014",
+    "premise": "Average ED wait times increased from 24 minutes (Q4 2024 baseline) to 41 minutes by March 2025.",
+    "hypothesis": "ED Wait Time / Triage Delay complaints increased by 117% in Q1.",
+    "label": "entailment",
+    "source_a": "ED_Nursing_Shift_Log_Q1.txt",
+    "source_b": "Patient_Complaints_Register_Q1.txt",
+    "note": "Both corroborate deteriorating ED wait times."
+  },
+  {
+    "id": "A015",
+    "premise": "Registration Speed satisfaction improved 8.0% in Q1.",
+    "hypothesis": "The recent deployment of the digital token management system in January 2025 contributed to registration improvements.",
+    "label": "entailment",
+    "source_a": "Patient_Satisfaction_Survey_Q1.txt",
+    "source_b": "Outpatient_Feedback_Aggregation_Q1.txt",
+    "note": "Both support improved registration experience."
+  },
+  {
+    "id": "A016",
+    "premise": "No emergency procurement requests from ED were processed during Q1.",
+    "hypothesis": "Three more emergency procurement requests were submitted in March 2025.",
+    "label": "contradiction",
+    "source_a": "Q1_Financial_Summary.txt",
+    "source_b": "ED_Nursing_Shift_Log_Q1.txt",
+    "note": "Finance reports zero emergency procurements; nursing log reports 5 total (2 in Feb, 3 in March)."
+  },
+  {
+    "id": "A017",
+    "premise": "Staff overtime in March was the highest recorded since Q3 2022.",
+    "hypothesis": "Personnel costs including overtime were INR 1.47 crore, which was INR 0.08 crore below budget due to some shift vacancies.",
+    "label": "contradiction",
+    "source_a": "ED_Nursing_Shift_Log_Q1.txt",
+    "source_b": "Q1_Financial_Summary.txt",
+    "note": "Record overtime vs below-budget personnel costs — directional contradiction."
+  },
+  {
+    "id": "A018",
+    "premise": "Diagnostic (Lab/X-ray) Wait Time satisfaction declined 5.7% in Q1.",
+    "hypothesis": "Lab results take too long — highest frequency negative theme with 201 mentions.",
+    "label": "entailment",
+    "source_a": "Outpatient_Feedback_Aggregation_Q1.txt",
+    "source_b": "Outpatient_Feedback_Aggregation_Q1.txt",
+    "note": "Consistent within same document."
+  },
+  {
+    "id": "A019",
+    "premise": "The Finance Department projects continued budgetary compliance through Q2 2025.",
+    "hypothesis": "The ED nursing supervisor formally submitted two emergency procurement requests in February.",
+    "label": "neutral",
+    "source_a": "Q1_Financial_Summary.txt",
+    "source_b": "ED_Nursing_Shift_Log_Q1.txt",
+    "note": "Projection vs historical fact — neutral relationship."
+  },
+  {
+    "id": "A020",
+    "premise": "Total nursing services expenditure for Q1 was INR 4.10 crore against a budget of INR 4.25 crore.",
+    "hypothesis": "Agency nursing hours in Q1 totalled 352 hours against a budget assumption of 112 hours.",
+    "label": "contradiction",
+    "source_a": "Q1_Financial_Summary.txt",
+    "source_b": "ED_Nursing_Shift_Log_Q1.txt",
+    "note": "Finance shows nursing underspend but nursing log shows 3x agency hours overspend."
+  },
+  {
+    "id": "A021",
+    "premise": "287 complaints (92%) were formally acknowledged within 72 hours (SLA target: 90%).",
+    "hypothesis": "241 complaints (77%) were resolved and closed within 30 days (SLA target: 75%).",
+    "label": "entailment",
+    "source_a": "Patient_Complaints_Register_Q1.txt",
+    "source_b": "Patient_Complaints_Register_Q1.txt",
+    "note": "Both SLA metrics met — consistent within document."
+  },
+  {
+    "id": "A022",
+    "premise": "Nursing care quality satisfaction improved 4.7% in Q1.",
+    "hypothesis": "Nursing availability complaints rose 139% in Q1.",
+    "label": "contradiction",
+    "source_a": "Patient_Satisfaction_Survey_Q1.txt",
+    "source_b": "Patient_Complaints_Register_Q1.txt",
+    "note": "Survey shows nursing care improvement while complaints show 139% rise in nursing availability issues."
+  },
+  {
+    "id": "A023",
+    "premise": "The hospital's overall patient satisfaction improved by 20%.",
+    "hypothesis": "The OPD feedback aggregation indicates only a 2.6% improvement in overall OPD satisfaction.",
+    "label": "contradiction",
+    "source_a": "Q1_Financial_Summary.txt",
+    "source_b": "Outpatient_Feedback_Aggregation_Q1.txt",
+    "note": "20% headline vs 2.6% OPD reality."
+  },
+  {
+    "id": "A024",
+    "premise": "The LWBS rate reached 4.2%, above the hospital's target of 2.0%.",
+    "hypothesis": "68% of ED patients rated their experience as Good or Excellent.",
+    "label": "contradiction",
+    "source_a": "ED_Nursing_Shift_Log_Q1.txt",
+    "source_b": "Patient_Satisfaction_Survey_Q1.txt",
+    "note": "High LWBS and operational failure vs positive ED satisfaction scores."
+  },
+  {
+    "id": "A025",
+    "premise": "The Q1 2025 Patient Satisfaction Survey shows a broadly positive picture of patient experience across the hospital.",
+    "hypothesis": "Q1 2025 recorded the highest quarterly complaint volume since Q1 2023.",
+    "label": "contradiction",
+    "source_a": "Patient_Satisfaction_Survey_Q1.txt",
+    "source_b": "Patient_Complaints_Register_Q1.txt",
+    "note": "Broadly positive survey vs record complaint volume."
+  },
+  {
+    "id": "A026",
+    "premise": "Cleanliness and hygiene complaints decreased by 37%.",
+    "hypothesis": "Cleanliness and Hygiene satisfaction improved 8.0% in Q1.",
+    "label": "entailment",
+    "source_a": "Patient_Complaints_Register_Q1.txt",
+    "source_b": "Patient_Satisfaction_Survey_Q1.txt",
+    "note": "Both corroborate cleanliness improvement."
+  },
+  {
+    "id": "A027",
+    "premise": "Registration and consultation experience improvements align with the recent deployment of the digital token management system.",
+    "hypothesis": "Registration Speed satisfaction improved 8.0% in Q1.",
+    "label": "entailment",
+    "source_a": "Outpatient_Feedback_Aggregation_Q1.txt",
+    "source_b": "Patient_Satisfaction_Survey_Q1.txt",
+    "note": "Both confirm registration improvements."
+  },
+  {
+    "id": "A028",
+    "premise": "The Finance Department confirms that no emergency procurement requests from ED were processed during Q1.",
+    "hypothesis": "Five emergency procurement requests were submitted during Q1 — two in February, three in March.",
+    "label": "contradiction",
+    "source_a": "Q1_Financial_Summary.txt",
+    "source_b": "ED_Nursing_Shift_Log_Q1.txt",
+    "note": "Zero vs five emergency procurement requests — strong contradiction."
+  },
+  {
+    "id": "A029",
+    "premise": "The nurse-to-patient ratio was 1:6 on 11 separate shifts, above the safe maximum of 1:4.5 per hospital policy.",
+    "hypothesis": "Nursing Care Quality satisfaction improved 4.7% in Q1.",
+    "label": "contradiction",
+    "source_a": "ED_Nursing_Shift_Log_Q1.txt",
+    "source_b": "Patient_Satisfaction_Survey_Q1.txt",
+    "note": "Unsafe staffing ratios vs positive nursing satisfaction scores."
+  },
+  {
+    "id": "A030",
+    "premise": "This represents a 25% increase over Q4 2024 (249 complaints) and is the highest quarterly complaint volume since Q1 2023.",
+    "hypothesis": "Q1 Patient Satisfaction Survey shows a broadly positive picture of patient experience.",
+    "label": "contradiction",
+    "source_a": "Patient_Complaints_Register_Q1.txt",
+    "source_b": "Patient_Satisfaction_Survey_Q1.txt",
+    "note": "Record complaints vs broadly positive satisfaction summary."
+  },
+  {
+    "id": "A031",
+    "premise": "Food and Facilities complaints declined in Q1.",
+    "hypothesis": "Food and Facilities satisfaction improved 4.9% in Q1.",
+    "label": "entailment",
+    "source_a": "Patient_Complaints_Register_Q1.txt",
+    "source_b": "Patient_Satisfaction_Survey_Q1.txt",
+    "note": "Both sources agree food and facilities improved."
+  },
+  {
+    "id": "A032",
+    "premise": "Three senior nursing staff were on extended medical leave simultaneously in February.",
+    "hypothesis": "Personnel costs including overtime were INR 0.08 crore below budget due to some shift vacancies.",
+    "label": "neutral",
+    "source_a": "ED_Nursing_Shift_Log_Q1.txt",
+    "source_b": "Q1_Financial_Summary.txt",
+    "note": "Consistent — vacancies in nursing caused leave-related savings per Finance report."
+  },
+  {
+    "id": "A033",
+    "premise": "Patient satisfaction trended upward through Q1 with improvements across all six measured domains.",
+    "hypothesis": "Q1 2025 recorded the highest quarterly complaint volume since Q1 2023.",
+    "label": "contradiction",
+    "source_a": "Patient_Satisfaction_Survey_Q1.txt",
+    "source_b": "Patient_Complaints_Register_Q1.txt",
+    "note": "Upward trend in survey vs record complaints."
+  },
+  {
+    "id": "A034",
+    "premise": "Average ED wait times increased from 24 minutes to 41 minutes by March 2025.",
+    "hypothesis": "Waiting Time Experience satisfaction improved 4.2% in Q1.",
+    "label": "contradiction",
+    "source_a": "ED_Nursing_Shift_Log_Q1.txt",
+    "source_b": "Patient_Satisfaction_Survey_Q1.txt",
+    "note": "70% longer wait times vs improved wait satisfaction score."
+  },
+  {
+    "id": "A035",
+    "premise": "The Finance Department projects continued budgetary compliance through Q2 2025.",
+    "hypothesis": "The Finance Department projects continued budgetary compliance through Q2 2025, assuming no unplanned procurement requirements.",
+    "label": "entailment",
+    "source_a": "Q1_Financial_Summary.txt",
+    "source_b": "Q1_Financial_Summary.txt",
+    "note": "Paraphrase within same document."
+  },
+  {
+    "id": "A036",
+    "premise": "ED complaint volume rose by 25% in Q1 compared to Q4.",
+    "hypothesis": "Emergency Department satisfaction subscore improved 11.6% in Q1.",
+    "label": "contradiction",
+    "source_a": "Patient_Complaints_Register_Q1.txt",
+    "source_b": "Patient_Satisfaction_Survey_Q1.txt",
+    "note": "25% complaint rise vs 11.6% satisfaction improvement in the same department."
+  },
+  {
+    "id": "A037",
+    "premise": "Nursing availability complaints rose 139% in Q1.",
+    "hypothesis": "Patient satisfaction trended upward through Q1 with improvements observed across all six measured domains.",
+    "label": "contradiction",
+    "source_a": "Patient_Complaints_Register_Q1.txt",
+    "source_b": "Patient_Satisfaction_Survey_Q1.txt",
+    "note": "139% rise in nursing complaints contradicts across-the-board satisfaction improvement."
+  },
+  {
+    "id": "A038",
+    "premise": "The Patient Relations Department received 312 formal complaints during Q1 2025.",
+    "hypothesis": "The patient experience programme is delivering improved outcomes.",
+    "label": "contradiction",
+    "source_a": "Patient_Complaints_Register_Q1.txt",
+    "source_b": "Q1_Financial_Summary.txt",
+    "note": "Record complaint volume vs Finance report's claim of improved outcomes."
+  },
+  {
+    "id": "A039",
+    "premise": "Pharmacy queue is very long — 156 mentions as a negative theme.",
+    "hypothesis": "Pharmacy Wait Time improved from 3.4 to 3.6 in Q1.",
+    "label": "neutral",
+    "source_a": "Outpatient_Feedback_Aggregation_Q1.txt",
+    "source_b": "Outpatient_Feedback_Aggregation_Q1.txt",
+    "note": "Both within same document — consistent reporting that pharmacy improved but remains slow."
+  },
+  {
+    "id": "A040",
+    "premise": "The hospital closed Q1 2025 within budgetary parameters across all major cost centres.",
+    "hypothesis": "Emergency Department spending exceeded allocation by approximately 12%.",
+    "label": "contradiction",
+    "source_a": "Q1_Financial_Summary.txt",
+    "source_b": "ED_Nursing_Shift_Log_Q1.txt",
+    "note": "Within budget claim vs 12% over-budget claim for ED specifically."
+  },
+  {
+    "id": "A041",
+    "premise": "Discharge Delays complaints showed only a marginal increase in Q1.",
+    "hypothesis": "Discharge Process satisfaction improved 4.7% in Q1.",
+    "label": "entailment",
+    "source_a": "Patient_Complaints_Register_Q1.txt",
+    "source_b": "Patient_Satisfaction_Survey_Q1.txt",
+    "note": "Both suggest discharge experience is broadly stable or improved."
+  },
+  {
+    "id": "A042",
+    "premise": "Overall OPD satisfaction improved only 2.6% in Q1.",
+    "hypothesis": "This represents an improvement of 20.1% — the largest single-quarter improvement since 2021.",
+    "label": "contradiction",
+    "source_a": "Outpatient_Feedback_Aggregation_Q1.txt",
+    "source_b": "Patient_Satisfaction_Survey_Q1.txt",
+    "note": "2.6% OPD improvement vs 20.1% PSI improvement — instrument divergence."
+  },
+  {
+    "id": "A043",
+    "premise": "Infection control complaints decreased by 37%.",
+    "hypothesis": "Cleanliness and Hygiene satisfaction improved 8.0% in Q1.",
+    "label": "entailment",
+    "source_a": "Patient_Complaints_Register_Q1.txt",
+    "source_b": "Patient_Satisfaction_Survey_Q1.txt",
+    "note": "Both agree on hygiene improvement."
+  },
+  {
+    "id": "A044",
+    "premise": "8 out of 11 ED referral patients reported an unsatisfactory experience.",
+    "hypothesis": "ED complaint volume rose by 25% in Q1.",
+    "label": "entailment",
+    "source_a": "Outpatient_Feedback_Aggregation_Q1.txt",
+    "source_b": "Patient_Complaints_Register_Q1.txt",
+    "note": "Both corroborate poor ED experience."
+  },
+  {
+    "id": "A045",
+    "premise": "The nurse-to-patient ratio exceeded safe limits on 11 separate shifts.",
+    "hypothesis": "The Finance Department confirms that nursing cost centre recorded a favourable variance of INR 0.15 crore.",
+    "label": "contradiction",
+    "source_a": "ED_Nursing_Shift_Log_Q1.txt",
+    "source_b": "Q1_Financial_Summary.txt",
+    "note": "Unsafe staffing (requiring more resources) vs favourable nursing budget variance."
+  },
+  {
+    "id": "A046",
+    "premise": "Communication (Doctor/Nurse) complaints showed only a 7% increase in Q1.",
+    "hypothesis": "Overall Communication satisfaction improved 6.2% in Q1.",
+    "label": "neutral",
+    "source_a": "Patient_Complaints_Register_Q1.txt",
+    "source_b": "Patient_Satisfaction_Survey_Q1.txt",
+    "note": "7% complaint increase and 6.2% satisfaction improvement are not contradictory given different measurement bases."
+  },
+  {
+    "id": "A047",
+    "premise": "Supply shortages continued into March for certain high-use consumables.",
+    "hypothesis": "Procurement costs for ED consumables were INR 0.82 crore against a budget of INR 0.90 crore.",
+    "label": "contradiction",
+    "source_a": "ED_Nursing_Shift_Log_Q1.txt",
+    "source_b": "Q1_Financial_Summary.txt",
+    "note": "Supply shortages vs underspend on consumables — Finance underspend may explain the shortages."
+  },
+  {
+    "id": "A048",
+    "premise": "The Q1 Patient Satisfaction Survey shows a broadly positive picture of patient experience.",
+    "hypothesis": "Nursing availability complaints rose 139% in Q1.",
+    "label": "contradiction",
+    "source_a": "Patient_Satisfaction_Survey_Q1.txt",
+    "source_b": "Patient_Complaints_Register_Q1.txt",
+    "note": "Broad positivity vs 139% surge in specific nursing complaints."
+  },
+  {
+    "id": "A049",
+    "premise": "Patient satisfaction improved by 20% compared to Q4 2024 benchmark.",
+    "hypothesis": "Administrators should interpret the satisfaction survey's 20% headline figure with caution.",
+    "label": "contradiction",
+    "source_a": "Q1_Financial_Summary.txt",
+    "source_b": "Outpatient_Feedback_Aggregation_Q1.txt",
+    "note": "Finance presents 20% uncritically; OPD feedback urges caution about the same figure."
+  },
+  {
+    "id": "A050",
+    "premise": "The hospital's Q1 financial summary confirms overall budgetary discipline.",
+    "hypothesis": "The Emergency Department's operational record for Q1 2025 indicates significant resource pressure.",
+    "label": "contradiction",
+    "source_a": "Q1_Financial_Summary.txt",
+    "source_b": "ED_Nursing_Shift_Log_Q1.txt",
+    "note": "Top-level summary vs departmental reality."
+  }
+]
