@@ -3,15 +3,25 @@ API Routes — Document Management Endpoints
 Handles document listing, content viewing, and re-ingestion.
 """
 import os
-from fastapi import APIRouter, HTTPException
+import re
+from typing import List
+
+from fastapi import APIRouter, File, HTTPException, UploadFile
 
 router = APIRouter(tags=["Documents"])
+
+
+def _safe_filename(name: str) -> str:
+    base = os.path.basename(name or "document")
+    stem, ext = os.path.splitext(base)
+    safe_stem = re.sub(r"[^A-Za-z0-9._ -]+", "_", stem).strip(" ._-") or "document"
+    return f"{safe_stem[:90]}{ext.lower()}"
 
 
 @router.get("/documents")
 async def list_documents():
     """List all documents in the sample_documents directory with metadata."""
-    from backend.config import SAMPLE_DOCS_DIR, SUPPORTED_EXTENSIONS
+    from backend.config import CHUNK_SIZE, SAMPLE_DOCS_DIR, SUPPORTED_EXTENSIONS
     from backend.ingestion import extract_department
 
     if not os.path.exists(SAMPLE_DOCS_DIR):
@@ -42,9 +52,53 @@ async def list_documents():
             "doc_type": ext.replace(".", "").upper(),
             "file_size": file_size,
             "file_size_display": f"{file_size / 1024:.1f} KB",
+            "chunks": max(1, file_size // max(CHUNK_SIZE, 1) + 1),
         })
 
-    return {"documents": documents, "total": len(documents)}
+    return {
+        "documents": documents,
+        "total": len(documents),
+        "total_chunks": sum(doc["chunks"] for doc in documents),
+    }
+
+
+@router.post("/documents/upload")
+async def upload_documents(files: List[UploadFile] = File(...)):
+    """Upload supported documents and rebuild the local vector store."""
+    from backend.config import SAMPLE_DOCS_DIR, SUPPORTED_EXTENSIONS
+    from backend.ingestion import ingest_documents
+    from backend.main import app_state
+
+    os.makedirs(SAMPLE_DOCS_DIR, exist_ok=True)
+    saved = []
+
+    for uploaded in files:
+        filename = _safe_filename(uploaded.filename)
+        ext = os.path.splitext(filename)[1].lower()
+        if ext not in SUPPORTED_EXTENSIONS:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Unsupported file type for {uploaded.filename}. Supported: {', '.join(SUPPORTED_EXTENSIONS)}",
+            )
+
+        target = os.path.join(SAMPLE_DOCS_DIR, filename)
+        with open(target, "wb") as out:
+            out.write(await uploaded.read())
+        saved.append(filename)
+
+    try:
+        app_state["vector_store"] = ingest_documents()
+        app_state["chain"] = None
+        count = app_state["vector_store"]._collection.count() if app_state["vector_store"] else 0
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Upload saved, but re-indexing failed: {exc}")
+
+    return {
+        "status": "ok",
+        "saved": saved,
+        "message": f"Uploaded {len(saved)} file(s) and indexed {count} chunks.",
+        "total_chunks": count,
+    }
 
 
 @router.get("/documents/{doc_id}")
