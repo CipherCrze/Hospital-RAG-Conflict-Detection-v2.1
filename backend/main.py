@@ -79,8 +79,6 @@ app.include_router(analytics_router, prefix="/api")
 
 # Serve frontend static files
 frontend_dir = os.path.join(PROJECT_ROOT, "frontend")
-if os.path.exists(frontend_dir):
-    app.mount("/style.css", StaticFiles(directory=frontend_dir), name="style")
 
 
 @app.get("/")
@@ -92,10 +90,9 @@ async def serve_frontend():
     return {"message": "Hospital Management System API", "docs": "/docs"}
 
 
-@app.get("/style.css")
-async def serve_css():
-    css_path = os.path.join(frontend_dir, "style.css")
-    return FileResponse(css_path, media_type="text/css")
+# Mount static files AFTER explicit routes so they don't shadow them
+if os.path.exists(frontend_dir):
+    app.mount("/static", StaticFiles(directory=frontend_dir), name="static")
 
 
 from pydantic import BaseModel
