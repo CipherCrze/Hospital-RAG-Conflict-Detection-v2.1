@@ -126,18 +126,39 @@
       <div id="page-documents" style="display:none">
         <div class="main-header">
           <div class="main-title">Documents</div>
-          <div class="main-sub">Manage indexed hospital knowledge base</div>
+          <div class="main-sub">Upload, index, and resolve evidence conflicts across hospital files</div>
         </div>
         <div class="upload-zone" onclick="document.getElementById('file-upload').click()">
-          Click to upload documents (PDF, TXT, DOCX)
+          <strong>Upload documents</strong>
+          <span>PDF, TXT, and DOCX files are saved and re-indexed for conflict-aware retrieval.</span>
           <input type="file" id="file-upload" multiple accept=".pdf,.txt,.docx" style="display:none" onchange="uploadFiles(this.files)">
         </div>
-        <div class="content-panel">
-          <div class="panel-header">
-            <span class="panel-title">Indexed Files</span>
-            <span style="font-size:12px;color:#3A5468" id="doc-chunk-count"></span>
+        <div class="documents-layout">
+          <div class="content-panel">
+            <div class="panel-header">
+              <span class="panel-title">Indexed Files</span>
+              <span style="font-size:12px;color:#3A5468" id="doc-chunk-count"></span>
+            </div>
+            <div id="doc-list"><div class="empty-state">Loading documents...</div></div>
           </div>
-          <div id="doc-list"><div class="empty-state">Loading documents…</div></div>
+          <div>
+            <div class="content-panel tips-panel">
+              <div class="panel-header"><span class="panel-title">Resolution Tips</span></div>
+              <div class="tips-list">
+                <div class="tip-card"><span>1</span><p>Use department, quarter, and source system in every file name.</p></div>
+                <div class="tip-card"><span>2</span><p>Re-index after uploads before running new conflict queries.</p></div>
+                <div class="tip-card"><span>3</span><p>For conflicting metrics, compare reporting period, denominator, and owning team.</p></div>
+              </div>
+            </div>
+            <div class="content-panel suggestions-panel">
+              <div class="panel-header"><span class="panel-title">Suggested Queries</span></div>
+              <div class="suggestion-list">
+                <div class="suggestion-item">Which documents disagree on Q1 patient satisfaction?</div>
+                <div class="suggestion-item">Which source should be authoritative for infection metrics?</div>
+                <div class="suggestion-item">Summarize unresolved conflicts by department.</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -346,11 +367,16 @@ function uploadFiles(files){
   var fd=new FormData();
   Array.from(files).forEach(function(f){fd.append('files',f);});
   var zone=document.querySelector('.upload-zone');
-  zone.textContent='Uploading…';
+  zone.innerHTML='<strong>Uploading and indexing...</strong><span>Please wait while the knowledge base refreshes.</span>';
   fetch(API+'/api/documents/upload',{method:'POST',body:fd})
     .then(function(r){return r.json();})
-    .then(function(){zone.textContent='Upload complete. Click to upload more.';loadDocuments();})
-    .catch(function(){zone.textContent='Upload failed. Click to retry.';});
+    .then(function(data){
+      zone.innerHTML='<strong>Upload complete</strong><span>'+(data.message||'Click to upload more documents.')+'</span>';
+      loadDocuments();
+    })
+    .catch(function(){
+      zone.innerHTML='<strong>Upload failed</strong><span>Check the file type and try again.</span>';
+    });
 }
 
 // ── Stats from backend ──────────────────────────────────────────────
