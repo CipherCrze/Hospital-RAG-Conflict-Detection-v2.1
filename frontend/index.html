@@ -5,9 +5,94 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Hospital RAG Dashboard — Conflict Detection & Document Intelligence">
   <title>Hospital RAG Dashboard</title>
-  <link rel="stylesheet" href="/static/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .app { font-family: 'DM Sans', sans-serif; display: flex; height: 680px; overflow: hidden; border-radius: 12px; border: 0.5px solid #1E2D3D; background: #0A0F14; color: #E8F0F7; }
+
+  .sidebar { width: 220px; flex-shrink: 0; display: flex; flex-direction: column; padding: 16px 0; overflow-y: auto; background: #0A0F14; border-right: 1px solid #1E2D3D; }
+  .sidebar-logo { padding: 4px 16px 16px; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4DB8FF; }
+  .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 7px 16px; font-size: 13px; text-decoration: none; cursor: pointer; border-left: 2px solid transparent; transition: background 0.15s; color: #7A9BB5; }
+  .sidebar-nav a.active, .sidebar-nav a:hover { background: #111820; color: #4DB8FF; }
+  .sidebar-nav a.active { border-left-color: #4DB8FF; }
+  .nav-icon { width: 14px; height: 14px; flex-shrink: 0; }
+  .section-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; padding: 12px 16px 4px; font-weight: 500; color: #3A5468; }
+  .profile-badge { display: flex; align-items: center; gap: 8px; margin: 8px 12px; padding: 8px 10px; border-radius: 8px; background: #111820; border: 1px solid #1E2D3D; color: #4DB8FF; }
+  .badge-initials { width: 28px; height: 28px; border-radius: 50%; background: #4DB8FF; color: #0A0F14; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .badge-name { font-size: 12px; font-weight: 500; }
+  .badge-sub { font-size: 10px; opacity: 0.6; }
+
+  .dept-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; padding: 4px 12px 8px; }
+  .dept-btn { border-radius: 6px; padding: 5px 4px; cursor: pointer; text-align: center; transition: background 0.15s; background: #111820; border: 1.5px solid #1E2D3D; color: #7A9BB5; }
+  .dept-btn:hover { background: #162030; }
+  .dept-btn.empty { opacity: 0.15; pointer-events: none; }
+  .dept-code { font-size: 11px; font-weight: 600; font-family: 'DM Mono', monospace; }
+  .dept-name { font-size: 9px; opacity: 0.7; margin-top: 1px; }
+
+  .dept-btn.ed { border-color: #D94F3D !important; } .dept-btn.ed .dept-code { color: #D94F3D; }
+  .dept-btn.fn { border-color: #607080 !important; } .dept-btn.fn .dept-code { color: #7A9BB5; }
+  .dept-btn.ad { border-color: #7B5EA7 !important; } .dept-btn.ad .dept-code { color: #A67FD4; }
+  .dept-btn.ad.active { background: rgba(123,94,167,0.15) !important; }
+  .dept-btn.qx { border-color: #2E9E6B !important; } .dept-btn.qx .dept-code { color: #2E9E6B; }
+  .dept-btn.ic { border-color: #E09B2D !important; } .dept-btn.ic .dept-code { color: #E09B2D; }
+  .dept-btn.sg { border-color: #4DB8FF !important; } .dept-btn.sg .dept-code { color: #4DB8FF; }
+
+  .api-section { padding: 8px 12px; }
+  .api-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; opacity: 0.4; font-weight: 500; }
+  .api-input { width: 100%; padding: 6px 8px; border-radius: 6px; font-size: 12px; font-family: 'DM Mono', monospace; outline: none; background: #111820; border: 1px solid #1E2D3D; color: #E8F0F7; }
+
+  .main { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+  .main-inner { padding: 28px 32px; flex: 1; overflow-y: auto; }
+  .main-header { margin-bottom: 24px; }
+  .main-title { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; color: #E8F0F7; }
+  .main-sub { font-size: 13px; margin-top: 3px; color: #7A9BB5; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 28px; }
+  .stat-card { border-radius: 10px; padding: 16px 18px; border-left-width: 3px; border-left-style: solid; background: #111820; border-top: 1px solid #1E2D3D; border-right: 1px solid #1E2D3D; border-bottom: 1px solid #1E2D3D; }
+  .stat-value { font-size: 30px; font-weight: 500; font-family: 'DM Mono', monospace; line-height: 1; margin-bottom: 6px; }
+  .stat-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; color: #7A9BB5; }
+
+  .stat-card.chunks { border-left-color: #4DB8FF; } .stat-card.chunks .stat-value { color: #4DB8FF; }
+  .stat-card.queries { border-left-color: #00D68F; } .stat-card.queries .stat-value { color: #00D68F; }
+  .stat-card.conflicts { border-left-color: #FF5C5C; } .stat-card.conflicts .stat-value { color: #FF5C5C; }
+  .stat-card.confidence { border-left-color: #FFB547; } .stat-card.confidence .stat-value { color: #FFB547; }
+
+  .bottom-grid { display: grid; grid-template-columns: 1fr 260px; gap: 20px; }
+  .section-title { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; color: #7A9BB5; }
+  .empty-state { padding: 24px; border-radius: 8px; font-size: 13px; font-style: italic; text-align: center; color: #3A5468; border: 1px solid #1E2D3D; background: #111820; }
+  .action-btn { display: block; width: 100%; padding: 10px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; text-align: left; margin-bottom: 6px; transition: background 0.15s; font-family: 'DM Sans', sans-serif; background: #111820; border: 1px solid #1E2D3D; color: #E8F0F7; }
+  .action-btn:hover { background: #162030; }
+  .active-profile-card { border-radius: 8px; padding: 12px 14px; margin-top: 12px; background: #111820; border: 1px solid #1E2D3D; }
+  .active-profile-name { font-size: 13px; font-weight: 600; color: #E8F0F7; }
+  .active-profile-sub { font-size: 11px; margin-top: 2px; color: #7A9BB5; }
+  .active-indicator { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #00D68F; margin-right: 6px; vertical-align: middle; }
+
+  .content-panel { border-radius: 10px; overflow: hidden; background: #111820; border: 1px solid #1E2D3D; }
+  .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #1E2D3D; }
+  .panel-title { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #7A9BB5; }
+
+  .query-form { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .query-textarea { width: 100%; padding: 10px 12px; border-radius: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; resize: none; outline: none; height: 80px; background: #0A0F14; border: 1px solid #1E2D3D; color: #E8F0F7; }
+  .query-submit { padding: 9px 16px; border-radius: 8px; background: #4DB8FF; color: #0A0F14; border: none; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; align-self: flex-end; }
+  .query-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; font-size: 13px; cursor: pointer; border-bottom: 1px solid #162030; color: #E8F0F7; }
+  .query-item:hover { background: #162030; }
+  .query-badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; background: #162030; color: #7A9BB5; }
+  .doc-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; font-size: 13px; cursor: pointer; border-bottom: 1px solid #162030; color: #E8F0F7; }
+  .doc-item:hover { background: #162030; }
+  .doc-badge { font-size: 11px; font-family: 'DM Mono', monospace; color: #7A9BB5; }
+
+  .settings-section { padding: 14px 16px; border-bottom: 1px solid #1E2D3D; }
+  .settings-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; color: #7A9BB5; }
+  .settings-input { width: 100%; padding: 7px 10px; border-radius: 6px; font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none; margin-top: 4px; background: #0A0F14; border: 1px solid #1E2D3D; color: #E8F0F7; }
+  .settings-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; font-size: 13px; color: #E8F0F7; }
+  .toggle-pill { width: 36px; height: 20px; border-radius: 10px; background: #00D68F; cursor: pointer; position: relative; flex-shrink: 0; transition: background 0.2s; }
+  .toggle-pill::after { content: ''; position: absolute; width: 14px; height: 14px; border-radius: 50%; background: #fff; top: 3px; right: 3px; transition: left 0.2s, right 0.2s; }
+  .toggle-pill.off { background: #1E2D3D; }
+  .toggle-pill.off::after { right: auto; left: 3px; }
+  </style>
 </head>
-<body>
+<body style="background:#060a0e;margin:0;padding:18px;font-family:'DM Sans',sans-serif;">
 <div class="app" id="app">
   <div class="sidebar">
     <div class="sidebar-logo">Hospital RAG</div>
@@ -53,25 +138,23 @@
 
     <div class="api-section">
       <div class="api-label">Gemini 2.5 Flash API Key</div>
-      <input class="api-input" id="api-key" type="password" placeholder="Enter key...">
-      <div class="api-status" id="api-status"></div>
+      <input class="api-input" type="password" value="Alza..." placeholder="Enter key..." />
     </div>
   </div>
 
   <div class="main">
     <div class="main-inner">
 
-      <!-- DASHBOARD -->
       <div id="page-dashboard">
         <div class="main-header">
           <div class="main-title">Dashboard</div>
-          <div class="main-sub">Hospital intelligence overview — Q1 2025</div>
+          <div class="main-sub">Hospital intelligence overview &#8212; Q1 2025</div>
         </div>
         <div class="stats-grid">
-          <div class="stat-card chunks"><div class="stat-value" id="stat-chunks">58</div><div class="stat-label">Indexed Chunks</div></div>
+          <div class="stat-card chunks"><div class="stat-value">58</div><div class="stat-label">Indexed Chunks</div></div>
           <div class="stat-card queries"><div class="stat-value" id="stat-queries">0</div><div class="stat-label">Queries Run</div></div>
-          <div class="stat-card conflicts"><div class="stat-value" id="stat-conflicts">0</div><div class="stat-label">Conflicts Found</div></div>
-          <div class="stat-card confidence"><div class="stat-value" id="stat-conf">&mdash;</div><div class="stat-label">Avg Confidence</div></div>
+          <div class="stat-card conflicts"><div class="stat-value">0</div><div class="stat-label">Conflicts Found</div></div>
+          <div class="stat-card confidence"><div class="stat-value" id="stat-conf">&#8212;</div><div class="stat-label">Avg Confidence</div></div>
         </div>
         <div class="bottom-grid">
           <div>
@@ -88,13 +171,12 @@
             <div class="section-title" style="margin-top:18px;">Active Profile</div>
             <div class="active-profile-card">
               <div class="active-profile-name"><span class="active-indicator"></span><span id="active-profile-name">Administration</span></div>
-              <div class="active-profile-sub">Hospital RAG v2.0 · Q1 2025</div>
+              <div class="active-profile-sub">Hospital RAG v2.0 &#183; Q1 2025</div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- QUERY -->
       <div id="page-query" style="display:none">
         <div class="main-header">
           <div class="main-title">Query &amp; Analysis</div>
@@ -104,35 +186,30 @@
           <div class="panel-header"><span class="panel-title">New Query</span></div>
           <div class="query-form">
             <textarea class="query-textarea" id="query-input" placeholder="Ask a question about your indexed documents..."></textarea>
-            <button class="query-submit" id="query-btn" onclick="runQuery()">Run Query</button>
+            <button class="query-submit" onclick="runQuery()">Run Query</button>
           </div>
         </div>
-        <div id="query-answer"></div>
-        <div class="section-title" style="margin-top:20px;">Query History</div>
+        <div class="section-title">Query History</div>
         <div class="content-panel" id="query-history-panel">
           <div class="empty-state" id="query-empty">No queries yet.</div>
         </div>
       </div>
 
-      <!-- DOCUMENTS -->
       <div id="page-documents" style="display:none">
         <div class="main-header">
           <div class="main-title">Documents</div>
           <div class="main-sub">Manage indexed hospital knowledge base</div>
         </div>
         <div class="content-panel">
-          <div class="panel-header"><span class="panel-title">Indexed Files</span><span style="font-size:12px;color:#3A5468;" id="doc-total">58 chunks</span></div>
-          <div id="doc-list">
-            <div class="doc-item"><span>Clinical Guidelines 2024.pdf</span><span class="doc-badge">18 chunks</span></div>
-            <div class="doc-item"><span>Emergency Protocols v3.pdf</span><span class="doc-badge">12 chunks</span></div>
-            <div class="doc-item"><span>Infection Control Manual.pdf</span><span class="doc-badge">14 chunks</span></div>
-            <div class="doc-item"><span>Admin Handbook Q1.pdf</span><span class="doc-badge">9 chunks</span></div>
-            <div class="doc-item"><span>Finance SOP 2025.pdf</span><span class="doc-badge">5 chunks</span></div>
-          </div>
+          <div class="panel-header"><span class="panel-title">Indexed Files</span><span style="font-size:12px;color:#3A5468;">58 chunks</span></div>
+          <div class="doc-item"><span>Clinical Guidelines 2024.pdf</span><span class="doc-badge">18 chunks</span></div>
+          <div class="doc-item"><span>Emergency Protocols v3.pdf</span><span class="doc-badge">12 chunks</span></div>
+          <div class="doc-item"><span>Infection Control Manual.pdf</span><span class="doc-badge">14 chunks</span></div>
+          <div class="doc-item"><span>Admin Handbook Q1.pdf</span><span class="doc-badge">9 chunks</span></div>
+          <div class="doc-item"><span>Finance SOP 2025.pdf</span><span class="doc-badge">5 chunks</span></div>
         </div>
       </div>
 
-      <!-- SETTINGS -->
       <div id="page-settings" style="display:none">
         <div class="main-header">
           <div class="main-title">Settings</div>
@@ -142,7 +219,7 @@
           <div class="settings-section">
             <div class="settings-label">API Configuration</div>
             <div class="settings-row"><span>Gemini 2.5 Flash API Key</span></div>
-            <input class="settings-input" id="settings-key" type="password" placeholder="Enter key...">
+            <input class="settings-input" type="password" value="Alza..." />
           </div>
           <div class="settings-section">
             <div class="settings-label">Query Preferences</div>
@@ -153,7 +230,7 @@
           <div class="settings-section" style="border-bottom:none;">
             <div class="settings-label">Chunk Size</div>
             <div class="settings-row"><span id="chunk-label">512 tokens</span></div>
-            <input type="range" min="128" max="1024" step="128" value="512" style="width:100%;margin-top:6px;" oninput="document.getElementById('chunk-label').textContent=this.value+' tokens'">
+            <input type="range" min="128" max="1024" step="128" value="512" style="width:100%;margin-top:6px;" oninput="document.getElementById('chunk-label').textContent=this.value+' tokens'" />
           </div>
         </div>
       </div>
@@ -163,161 +240,57 @@
 </div>
 
 <script>
-/* ── State ── */
 var queries = [];
 var qCount = 0;
-var conflictCount = 0;
-var confSum = 0;
-var API_BASE = '/api';
 
-/* ── Helpers ── */
-function esc(v) { var d = document.createElement('div'); d.textContent = String(v||''); return d.innerHTML; }
-
-/* ── Navigation ── */
 function showPage(p) {
   ['dashboard','query','documents','settings'].forEach(function(id) {
     document.getElementById('page-'+id).style.display = id===p ? '' : 'none';
     var nav = document.getElementById('nav-'+id);
-    if (nav) { if (id===p) nav.classList.add('active'); else nav.classList.remove('active'); }
+    if(nav) nav.className = id===p ? 'active' : '';
   });
-  if (p === 'documents') loadDocuments();
-  if (p === 'dashboard') loadAnalytics();
 }
 
-/* ── Profile ── */
 function switchProfile(code, name, color) {
   document.querySelectorAll('.dept-btn').forEach(function(b){ b.classList.remove('active'); });
   var map = {ED:'ed',FN:'fn',AD:'ad',QX:'qx',IC:'ic',SG:'sg'};
   var el = document.querySelector('.dept-btn.'+map[code]);
-  if (el) el.classList.add('active');
+  if(el) el.classList.add('active');
   document.getElementById('badge-initials').textContent = code;
   document.getElementById('badge-initials').style.background = color;
   document.getElementById('badge-name').textContent = name;
   document.getElementById('active-profile-name').textContent = name;
 }
 
-/* ── Query (backend-integrated with local fallback) ── */
 function runQuery() {
   var input = document.getElementById('query-input');
   var text = input.value.trim();
-  if (!text) return;
-  var btn = document.getElementById('query-btn');
-  btn.disabled = true; btn.textContent = 'Running...';
-  var ansBox = document.getElementById('query-answer');
-  ansBox.innerHTML = '<div class="answer-box"><span class="spinner"></span> Querying documents...</div>';
-
-  var apiKey = localStorage.getItem('hrag_key') || '';
-  fetch(API_BASE + '/query', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ question: text, api_key: apiKey || undefined })
-  }).then(function(r){ return r.ok ? r.json() : r.json().then(function(e){ throw new Error(e.detail||'Query failed'); }); })
-  .then(function(data) {
-    qCount++;
-    var conf = data.confidence ? data.confidence.score : Math.floor(75+Math.random()*20);
-    var cCount = data.conflicts ? data.conflicts.conflict_count : 0;
-    conflictCount += cCount;
-    confSum += conf;
-    queries.unshift({ text:text, time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}), conf:conf, conflicts:cCount });
-    input.value = '';
-    updateStats();
-    renderHistory();
-    // Show answer
-    var html = '<div class="answer-box">' + esc(data.answer||data.result||'No answer returned.') + '</div>';
-    if (data.conflicts && data.conflicts.conflict_count > 0) {
-      html += '<div class="conflict-box"><strong>Conflicts Detected: '+data.conflicts.conflict_count+'</strong>';
-      (data.conflicts.details||[]).forEach(function(c){ html += '<br>• '+esc(c.description||c); });
-      html += '</div>';
-    }
-    ansBox.innerHTML = html;
-  }).catch(function(err) {
-    // Fallback: local-only mode
-    qCount++;
-    var conf = Math.floor(75+Math.random()*20);
-    var sim = Math.random()>0.6;
-    if (sim) conflictCount++;
-    confSum += conf;
-    queries.unshift({ text:text, time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}), conf:conf, conflicts:sim?1:0 });
-    input.value = '';
-    updateStats();
-    renderHistory();
-    ansBox.innerHTML = '<div class="answer-box" style="border-left-color:#FFB547;">Backend offline — running in local demo mode.<br>' + esc(err.message) + '</div>';
-  }).finally(function() {
-    btn.disabled = false; btn.textContent = 'Run Query';
-  });
-}
-
-function updateStats() {
+  if(!text) return;
+  qCount++;
+  queries.unshift({text: text, time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})});
+  input.value = '';
   document.getElementById('stat-queries').textContent = qCount;
-  document.getElementById('stat-conflicts').textContent = conflictCount;
-  document.getElementById('stat-conf').textContent = qCount ? Math.round(confSum/qCount)+'%' : '\u2014';
-}
-
-function renderHistory() {
+  var conf = Math.floor(75 + Math.random()*20);
+  document.getElementById('stat-conf').textContent = conf + '%';
   var hp = document.getElementById('query-history-panel');
-  if (!queries.length) { hp.innerHTML = '<div class="empty-state">No queries yet.</div>'; return; }
-  hp.innerHTML = queries.map(function(q) {
-    return '<div class="query-item"><span style="flex:1;margin-right:12px;">'+esc(q.text.substring(0,60))+(q.text.length>60?'…':'')+'</span><span class="query-badge">'+q.conf+'% conf</span></div>';
-  }).join('');
+  var empty = document.getElementById('query-empty');
+  if(empty) empty.style.display = 'none';
+  var div = document.createElement('div');
+  div.className = 'query-item';
+  div.innerHTML = '<span style="flex:1;margin-right:12px;">' + text.substring(0,60) + (text.length>60?'\u2026':'') + '</span><span class="query-badge">' + conf + '% conf</span>';
+  hp.appendChild(div);
   var rl = document.getElementById('recent-queries-list');
-  var rows = queries.slice(0,3).map(function(q) {
-    return '<div class="query-item"><span style="flex:1">'+esc(q.text.substring(0,50))+(q.text.length>50?'…':'')+'</span><span class="query-badge">'+q.time+'</span></div>';
-  }).join('');
-  rl.innerHTML = '<div class="content-panel">'+rows+'</div>';
-}
-
-/* ── Documents (backend-integrated) ── */
-function loadDocuments() {
-  var listEl = document.getElementById('doc-list');
-  var totalEl = document.getElementById('doc-total');
-  fetch(API_BASE + '/documents').then(function(r){ return r.ok ? r.json() : Promise.reject(); })
-  .then(function(data) {
-    var docs = data.documents || [];
-    totalEl.textContent = (data.total_chunks||0) + ' chunks';
-    if (!docs.length) { listEl.innerHTML = '<div class="empty-state">No documents indexed yet.</div>'; return; }
-    listEl.innerHTML = docs.map(function(d) {
-      return '<div class="doc-item"><span>'+esc(d.filename||d.doc_id||'document')+'</span><span class="doc-badge">'+(d.chunks||0)+' chunks</span></div>';
-    }).join('');
-    if (data.total_chunks != null) document.getElementById('stat-chunks').textContent = data.total_chunks;
-  }).catch(function() {
-    totalEl.textContent = '58 chunks';
+  rl.innerHTML = '';
+  var panel = document.createElement('div');
+  panel.className = 'content-panel';
+  queries.slice(0,3).forEach(function(q){
+    var d = document.createElement('div');
+    d.className = 'query-item';
+    d.innerHTML = '<span style="flex:1">' + q.text.substring(0,50) + (q.text.length>50?'\u2026':'') + '</span><span class="query-badge">' + q.time + '</span>';
+    panel.appendChild(d);
   });
+  rl.appendChild(panel);
 }
-
-/* ── Analytics (backend-integrated) ── */
-function loadAnalytics() {
-  fetch(API_BASE + '/analytics/overview').then(function(r){ return r.ok ? r.json() : Promise.reject(); })
-  .then(function(d) {
-    if (d.total_chunks) document.getElementById('stat-chunks').textContent = d.total_chunks;
-    if (d.total_queries) document.getElementById('stat-queries').textContent = d.total_queries;
-    if (d.total_conflicts_detected) document.getElementById('stat-conflicts').textContent = d.total_conflicts_detected;
-    if (d.avg_confidence) document.getElementById('stat-conf').textContent = d.avg_confidence + '%';
-  }).catch(function(){});
-}
-
-/* ── API Key sync ── */
-function syncApiKey(key) {
-  localStorage.setItem('hrag_key', key);
-  document.getElementById('api-key').value = key;
-  document.getElementById('settings-key').value = key;
-  document.getElementById('api-status').textContent = key ? 'Key saved locally' : '';
-  if (key) {
-    fetch(API_BASE + '/set-api-key', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({api_key:key})
-    }).then(function(r){ if(r.ok) document.getElementById('api-status').textContent='Key saved & sent to backend'; })
-    .catch(function(){});
-  }
-}
-
-/* ── Init ── */
-window.onload = function() {
-  var saved = localStorage.getItem('hrag_key');
-  if (saved) { document.getElementById('api-key').value=saved; document.getElementById('settings-key').value=saved; document.getElementById('api-status').textContent='Key loaded'; }
-  document.getElementById('api-key').addEventListener('change', function(){ syncApiKey(this.value.trim()); });
-  document.getElementById('settings-key').addEventListener('change', function(){ syncApiKey(this.value.trim()); });
-  loadAnalytics();
-};
 </script>
 </body>
 </html>
