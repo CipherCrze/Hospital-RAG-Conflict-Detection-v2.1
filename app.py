@@ -1,312 +1,145 @@
+"""app.py — Main Application Entry Point with Exact Clinical UI"""
+import os, sys
 import streamlit as st
-import streamlit.components.v1 as components
+from pathlib import Path
 
-st.set_page_config(page_title="Hospital RAG", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Hospital RAG", page_icon="H", layout="wide", initial_sidebar_state="expanded")
 
-# Hide standard Streamlit UI elements to allow the custom UI to take over
-st.markdown("""
-<style>
-    #MainMenu {visibility: hidden;}
-    header {visibility: hidden;}
-    footer {visibility: hidden;}
-    [data-testid="collapsedControl"] {display: none;}
-    .block-container {
-        padding-top: 2rem !important;
-        padding-bottom: 0rem !important;
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
-        max-width: 100% !important;
-    }
-</style>
-""", unsafe_allow_html=True)
+ROOT = os.path.dirname(os.path.abspath(__file__))
+if ROOT not in sys.path: sys.path.insert(0, ROOT)
 
-html_content = """
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+from theme import inject
+st.markdown(inject(), unsafe_allow_html=True)
 
-  .app { font-family: 'DM Sans', sans-serif; display: flex; height: 680px; overflow: hidden; border-radius: 12px; border: 0.5px solid #1E2D3D; background: #0A0F14; color: #E8F0F7; }
+# Defaults
+st.session_state.setdefault("api_key", os.environ.get("GOOGLE_API_KEY", ""))
+st.session_state.setdefault("query_history", [])
+st.session_state.setdefault("top_k", 8)
+st.session_state.setdefault("llm_temp", 0.2)
+st.session_state.setdefault("page", "dashboard")
 
-  .sidebar { width: 220px; flex-shrink: 0; display: flex; flex-direction: column; padding: 16px 0; overflow-y: auto; background: #0A0F14; border-right: 1px solid #1E2D3D; }
-  .sidebar-logo { padding: 4px 16px 16px; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4DB8FF; }
-  .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 7px 16px; font-size: 13px; text-decoration: none; cursor: pointer; border-left: 2px solid transparent; transition: background 0.15s; color: #7A9BB5; }
-  .sidebar-nav a.active, .sidebar-nav a:hover { background: #111820; color: #4DB8FF; }
-  .sidebar-nav a.active { border-left-color: #4DB8FF; }
-  .nav-icon { width: 14px; height: 14px; flex-shrink: 0; }
-  .section-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; padding: 12px 16px 4px; font-weight: 500; color: #3A5468; }
-  .profile-badge { display: flex; align-items: center; gap: 8px; margin: 8px 12px; padding: 8px 10px; border-radius: 8px; background: #111820; border: 1px solid #1E2D3D; color: #4DB8FF; }
-  .badge-initials { width: 28px; height: 28px; border-radius: 50%; background: #4DB8FF; color: #0A0F14; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .badge-name { font-size: 12px; font-weight: 500; }
-  .badge-sub { font-size: 10px; opacity: 0.6; }
+from config import CHROMA_PERSIST_DIR
 
-  .dept-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; padding: 4px 12px 8px; }
-  .dept-btn { border-radius: 6px; padding: 5px 4px; cursor: pointer; text-align: center; transition: background 0.15s; background: #111820; border: 1.5px solid #1E2D3D; color: #7A9BB5; }
-  .dept-btn:hover { background: #162030; }
-  .dept-btn.empty { opacity: 0.15; pointer-events: none; }
-  .dept-code { font-size: 11px; font-weight: 600; font-family: 'DM Mono', monospace; }
-  .dept-name { font-size: 9px; opacity: 0.7; margin-top: 1px; }
+# Departments
+DEPTS = [
+    {"id": "ED", "name": "Emergency", "hex": "#D94F3D", "class": "ed"},
+    {"id": "FN", "name": "Finance",   "hex": "#607080", "class": "fn"},
+    {"id": "AD", "name": "Admin",     "hex": "#7B5EA7", "class": "ad"},
+    {"id": "QX", "name": "Quality",   "hex": "#2E9E6B", "class": "qx"},
+    {"id": "IC", "name": "Infection", "hex": "#E09B2D", "class": "ic"},
+    {"id": "SG", "name": "Surgical",  "hex": "#4DB8FF", "class": "sg"},
+]
+st.session_state.setdefault("active_dept", DEPTS[2])  # Admin default
 
-  .dept-btn.ed { border-color: #D94F3D !important; } .dept-btn.ed .dept-code { color: #D94F3D; }
-  .dept-btn.fn { border-color: #607080 !important; } .dept-btn.fn .dept-code { color: #7A9BB5; }
-  .dept-btn.ad { border-color: #7B5EA7 !important; } .dept-btn.ad .dept-code { color: #A67FD4; }
-  .dept-btn.ad.active { background: rgba(123,94,167,0.15) !important; }
-  .dept-btn.qx { border-color: #2E9E6B !important; } .dept-btn.qx .dept-code { color: #2E9E6B; }
-  .dept-btn.ic { border-color: #E09B2D !important; } .dept-btn.ic .dept-code { color: #E09B2D; }
-  .dept-btn.sg { border-color: #4DB8FF !important; } .dept-btn.sg .dept-code { color: #4DB8FF; }
+@st.cache_resource(show_spinner="Loading document index…")
+def _get_vs(persist_dir):
+    from ingestion import load_vector_store
+    return load_vector_store(persist_dir)
 
-  .api-section { padding: 8px 12px; }
-  .api-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; opacity: 0.4; font-weight: 500; }
-  .api-input { width: 100%; padding: 6px 8px; border-radius: 6px; font-size: 12px; font-family: 'DM Mono', monospace; outline: none; background: #111820; border: 1px solid #1E2D3D; color: #E8F0F7; }
+@st.cache_resource(show_spinner="Connecting to Gemini…")
+def _get_chain(api_key, temp):
+    import config as _c; _c.LLM_TEMPERATURE = temp
+    from rag_pipeline import build_chain
+    return build_chain(api_key)
 
-  .main { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
-  .main-inner { padding: 28px 32px; flex: 1; overflow-y: auto; }
-  .main-header { margin-bottom: 24px; }
-  .main-title { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; color: #E8F0F7; }
-  .main-sub { font-size: 13px; margin-top: 3px; color: #7A9BB5; }
+chroma_path = Path(CHROMA_PERSIST_DIR)
+_vs, _chain = None, None
+if chroma_path.exists() and any(chroma_path.iterdir()):
+    try: _vs = _get_vs(CHROMA_PERSIST_DIR)
+    except Exception as e: st.warning(f"Vector store: {e}")
 
-  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 28px; }
-  .stat-card { border-radius: 10px; padding: 16px 18px; border-left-width: 3px; border-left-style: solid; background: #111820; border-top: 1px solid #1E2D3D; border-right: 1px solid #1E2D3D; border-bottom: 1px solid #1E2D3D; }
-  .stat-value { font-size: 30px; font-weight: 500; font-family: 'DM Mono', monospace; line-height: 1; margin-bottom: 6px; }
-  .stat-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; color: #7A9BB5; }
+api_key = st.session_state.get("api_key", "")
+if api_key:
+    try: _chain = _get_chain(api_key, st.session_state.get("llm_temp", 0.2))
+    except: pass
 
-  .stat-card.chunks { border-left-color: #4DB8FF; } .stat-card.chunks .stat-value { color: #4DB8FF; }
-  .stat-card.queries { border-left-color: #00D68F; } .stat-card.queries .stat-value { color: #00D68F; }
-  .stat-card.conflicts { border-left-color: #FF5C5C; } .stat-card.conflicts .stat-value { color: #FF5C5C; }
-  .stat-card.confidence { border-left-color: #FFB547; } .stat-card.confidence .stat-value { color: #FFB547; }
+# ── Sidebar ──
+with st.sidebar:
+    dept = st.session_state.active_dept
+    
+    st.markdown('<div class="sidebar-logo">Hospital RAG</div>', unsafe_allow_html=True)
+    
+    # Navigation
+    st.markdown('<div class="sidebar-nav">', unsafe_allow_html=True)
+    NAV = [
+        ("dashboard", "Dashboard", '<svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>'),
+        ("documents", "Documents", '<svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="1" width="10" height="13" rx="1"/><line x1="4.5" y1="5" x2="10.5" y2="5"/><line x1="4.5" y1="8" x2="10.5" y2="8"/><line x1="4.5" y1="11" x2="8" y2="11"/></svg>'),
+        ("query", "Query & Analysis", '<svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>'),
+        ("settings", "Settings", '<svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41"/></svg>')
+    ]
+    for key, label, svg in NAV:
+        active = "active" if st.session_state.page == key else ""
+        # We wrap the Streamlit button in a relative div, and style the button to be invisible over our HTML
+        html = f"""
+        <div class="click-wrapper">
+            <a class="sidebar-nav-item {active}">{svg} {label}</a>
+        </div>
+        """
+        st.markdown(html, unsafe_allow_html=True)
+        st.markdown('<div class="invisible-btn">', unsafe_allow_html=True)
+        if st.button(" ", key=f"nav_{key}", use_container_width=True):
+            st.session_state.page = key
+            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-  .bottom-grid { display: grid; grid-template-columns: 1fr 260px; gap: 20px; }
-  .section-title { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; color: #7A9BB5; }
-  .empty-state { padding: 24px; border-radius: 8px; font-size: 13px; font-style: italic; text-align: center; color: #3A5468; border: 1px solid #1E2D3D; background: #111820; }
-  .action-btn { display: block; width: 100%; padding: 10px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; text-align: left; margin-bottom: 6px; transition: background 0.15s; font-family: 'DM Sans', sans-serif; background: #111820; border: 1px solid #1E2D3D; color: #E8F0F7; }
-  .action-btn:hover { background: #162030; }
-  .active-profile-card { border-radius: 8px; padding: 12px 14px; margin-top: 12px; background: #111820; border: 1px solid #1E2D3D; }
-  .active-profile-name { font-size: 13px; font-weight: 600; color: #E8F0F7; }
-  .active-profile-sub { font-size: 11px; margin-top: 2px; color: #7A9BB5; }
-  .active-indicator { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #00D68F; margin-right: 6px; vertical-align: middle; }
-
-  .content-panel { border-radius: 10px; overflow: hidden; background: #111820; border: 1px solid #1E2D3D; }
-  .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #1E2D3D; }
-  .panel-title { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #7A9BB5; }
-
-  .query-form { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
-  .query-textarea { width: 100%; padding: 10px 12px; border-radius: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; resize: none; outline: none; height: 80px; background: #0A0F14; border: 1px solid #1E2D3D; color: #E8F0F7; }
-  .query-submit { padding: 9px 16px; border-radius: 8px; background: #4DB8FF; color: #0A0F14; border: none; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; align-self: flex-end; }
-  .query-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; font-size: 13px; cursor: pointer; border-bottom: 1px solid #162030; color: #E8F0F7; }
-  .query-item:hover { background: #162030; }
-  .query-badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; background: #162030; color: #7A9BB5; }
-  .doc-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; font-size: 13px; cursor: pointer; border-bottom: 1px solid #162030; color: #E8F0F7; }
-  .doc-item:hover { background: #162030; }
-  .doc-badge { font-size: 11px; font-family: 'DM Mono', monospace; color: #7A9BB5; }
-
-  .settings-section { padding: 14px 16px; border-bottom: 1px solid #1E2D3D; }
-  .settings-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; color: #7A9BB5; }
-  .settings-input { width: 100%; padding: 7px 10px; border-radius: 6px; font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none; margin-top: 4px; background: #0A0F14; border: 1px solid #1E2D3D; color: #E8F0F7; }
-  .settings-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; font-size: 13px; color: #E8F0F7; }
-  .toggle-pill { width: 36px; height: 20px; border-radius: 10px; background: #00D68F; cursor: pointer; position: relative; flex-shrink: 0; transition: background 0.2s; }
-  .toggle-pill::after { content: ''; position: absolute; width: 14px; height: 14px; border-radius: 50%; background: #fff; top: 3px; right: 3px; transition: left 0.2s, right 0.2s; }
-  .toggle-pill.off { background: #1E2D3D; }
-  .toggle-pill.off::after { right: auto; left: 3px; }
-</style>
-
-<div class="app" id="app">
-  <div class="sidebar">
-    <div class="sidebar-logo">Hospital RAG</div>
-    <nav class="sidebar-nav">
-      <a id="nav-dashboard" class="active" onclick="showPage('dashboard')">
-        <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
-        Dashboard
-      </a>
-      <a id="nav-documents" onclick="showPage('documents')">
-        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="1" width="10" height="13" rx="1"/><line x1="4.5" y1="5" x2="10.5" y2="5"/><line x1="4.5" y1="8" x2="10.5" y2="8"/><line x1="4.5" y1="11" x2="8" y2="11"/></svg>
-        Documents
-      </a>
-      <a id="nav-query" onclick="showPage('query')">
-        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>
-        Query & Analysis
-      </a>
-      <a id="nav-settings" onclick="showPage('settings')">
-        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41"/></svg>
-        Settings
-      </a>
-    </nav>
-
-    <div class="section-label">Active Profile</div>
+    # Active Profile
+    st.markdown('<div class="section-label">Active Profile</div>', unsafe_allow_html=True)
+    st.markdown(f"""
     <div class="profile-badge">
-      <div class="badge-initials" id="badge-initials">AD</div>
+      <div class="badge-initials" style="background:{dept['hex']}">{dept['id']}</div>
       <div>
-        <div class="badge-name" id="badge-name">Administration</div>
+        <div class="badge-name">{dept['name']}</div>
         <div class="badge-sub">Hospital RAG v2.0</div>
       </div>
     </div>
+    """, unsafe_allow_html=True)
 
-    <div class="section-label">Switch Profile</div>
-    <div class="dept-grid">
-      <div class="dept-btn ed" onclick="switchProfile('ED','Emergency','#D94F3D')"><div class="dept-code">ED</div><div class="dept-name">Emergency</div></div>
-      <div class="dept-btn fn" onclick="switchProfile('FN','Finance','#607080')"><div class="dept-code">FN</div><div class="dept-name">Finance</div></div>
-      <div class="dept-btn ad active" onclick="switchProfile('AD','Administration','#7B5EA7')"><div class="dept-code">AD</div><div class="dept-name">Admin</div></div>
-      <div class="dept-btn empty"></div><div class="dept-btn empty"></div><div class="dept-btn empty"></div>
-      <div class="dept-btn qx" onclick="switchProfile('QX','Quality','#2E9E6B')"><div class="dept-code">QX</div><div class="dept-name">Quality</div></div>
-      <div class="dept-btn ic" onclick="switchProfile('IC','Infection','#E09B2D')"><div class="dept-code">IC</div><div class="dept-name">Infection</div></div>
-      <div class="dept-btn sg" onclick="switchProfile('SG','Surgical','#4DB8FF')"><div class="dept-code">SG</div><div class="dept-name">Surgical</div></div>
-      <div class="dept-btn empty"></div><div class="dept-btn empty"></div><div class="dept-btn empty"></div>
-    </div>
+    # Switch Profile
+    st.markdown('<div class="section-label">Switch Profile</div>', unsafe_allow_html=True)
+    
+    for i in range(0, len(DEPTS), 3):
+        row_depts = DEPTS[i:i+3]
+        cols = st.columns(3)
+        for col, d in zip(cols, row_depts):
+            with col:
+                active_cls = "active" if d['id'] == dept['id'] else ""
+                st.markdown(f"""
+                <div class="click-wrapper">
+                    <div class="dept-btn {d['class']} {active_cls}">
+                        <div class="dept-code">{d['id']}</div>
+                        <div class="dept-name">{d['name']}</div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+                st.markdown('<div class="invisible-btn">', unsafe_allow_html=True)
+                if st.button(" ", key=f"dept_{d['id']}", use_container_width=True):
+                    st.session_state.active_dept = d
+                    st.rerun()
+                st.markdown('</div>', unsafe_allow_html=True)
 
-    <div class="api-section">
-      <div class="api-label">Gemini 2.5 Flash API Key</div>
-      <input class="api-input" type="password" value="Alza..." placeholder="Enter key..." />
-    </div>
-  </div>
+    # API Key
+    st.markdown('<div class="api-section"><div class="api-label">Gemini 2.5 Flash API Key</div></div>', unsafe_allow_html=True)
+    new_key = st.text_input("key", value=api_key, type="password", placeholder="Enter key...", label_visibility="collapsed")
+    if new_key.strip() != api_key:
+        st.session_state.api_key = new_key.strip()
+        os.environ["GOOGLE_API_KEY"] = new_key.strip()
+        st.cache_resource.clear()
+        st.rerun()
 
-  <div class="main">
-    <div class="main-inner">
 
-      <div id="page-dashboard">
-        <div class="main-header">
-          <div class="main-title">Dashboard</div>
-          <div class="main-sub">Hospital intelligence overview — Q1 2025</div>
-        </div>
-        <div class="stats-grid">
-          <div class="stat-card chunks"><div class="stat-value">58</div><div class="stat-label">Indexed Chunks</div></div>
-          <div class="stat-card queries"><div class="stat-value" id="stat-queries">0</div><div class="stat-label">Queries Run</div></div>
-          <div class="stat-card conflicts"><div class="stat-value">0</div><div class="stat-label">Conflicts Found</div></div>
-          <div class="stat-card confidence"><div class="stat-value" id="stat-conf">—</div><div class="stat-label">Avg Confidence</div></div>
-        </div>
-        <div class="bottom-grid">
-          <div>
-            <div class="section-title">Recent Queries</div>
-            <div id="recent-queries-list">
-              <div class="content-panel"><div class="empty-state">No queries yet. Head to Query & Analysis to get started.</div></div>
-            </div>
-          </div>
-          <div>
-            <div class="section-title">Quick Actions</div>
-            <button class="action-btn" onclick="showPage('query')">+ New Query</button>
-            <button class="action-btn" onclick="showPage('documents')">Manage Documents</button>
-            <button class="action-btn" onclick="showPage('settings')">Settings</button>
-            <div class="section-title" style="margin-top:18px;">Active Profile</div>
-            <div class="active-profile-card">
-              <div class="active-profile-name"><span class="active-indicator"></span><span id="active-profile-name">Administration</span></div>
-              <div class="active-profile-sub">Hospital RAG v2.0 · Q1 2025</div>
-            </div>
-          </div>
-        </div>
-      </div>
+# ── Main Content ──
+page = st.session_state.page
 
-      <div id="page-query" style="display:none">
-        <div class="main-header">
-          <div class="main-title">Query & Analysis</div>
-          <div class="main-sub">Run queries across indexed hospital documents</div>
-        </div>
-        <div class="content-panel" style="margin-bottom:20px;">
-          <div class="panel-header"><span class="panel-title">New Query</span></div>
-          <div class="query-form">
-            <textarea class="query-textarea" id="query-input" placeholder="Ask a question about your indexed documents..."></textarea>
-            <button class="query-submit" onclick="runQuery()">Run Query</button>
-          </div>
-        </div>
-        <div class="section-title">Query History</div>
-        <div class="content-panel" id="query-history-panel">
-          <div class="empty-state" id="query-empty">No queries yet.</div>
-        </div>
-      </div>
-
-      <div id="page-documents" style="display:none">
-        <div class="main-header">
-          <div class="main-title">Documents</div>
-          <div class="main-sub">Manage indexed hospital knowledge base</div>
-        </div>
-        <div class="content-panel">
-          <div class="panel-header"><span class="panel-title">Indexed Files</span><span style="font-size:12px;color:#3A5468;">58 chunks</span></div>
-          <div class="doc-item"><span>Clinical Guidelines 2024.pdf</span><span class="doc-badge">18 chunks</span></div>
-          <div class="doc-item"><span>Emergency Protocols v3.pdf</span><span class="doc-badge">12 chunks</span></div>
-          <div class="doc-item"><span>Infection Control Manual.pdf</span><span class="doc-badge">14 chunks</span></div>
-          <div class="doc-item"><span>Admin Handbook Q1.pdf</span><span class="doc-badge">9 chunks</span></div>
-          <div class="doc-item"><span>Finance SOP 2025.pdf</span><span class="doc-badge">5 chunks</span></div>
-        </div>
-      </div>
-
-      <div id="page-settings" style="display:none">
-        <div class="main-header">
-          <div class="main-title">Settings</div>
-          <div class="main-sub">Configure your Hospital RAG environment</div>
-        </div>
-        <div class="content-panel">
-          <div class="settings-section">
-            <div class="settings-label">API Configuration</div>
-            <div class="settings-row"><span>Gemini 2.5 Flash API Key</span></div>
-            <input class="settings-input" type="password" value="Alza..." />
-          </div>
-          <div class="settings-section">
-            <div class="settings-label">Query Preferences</div>
-            <div class="settings-row"><span>Enable conflict detection</span><div class="toggle-pill" onclick="this.classList.toggle('off')"></div></div>
-            <div class="settings-row"><span>Auto-index on upload</span><div class="toggle-pill off" onclick="this.classList.toggle('off')"></div></div>
-            <div class="settings-row"><span>Show confidence scores</span><div class="toggle-pill" onclick="this.classList.toggle('off')"></div></div>
-          </div>
-          <div class="settings-section" style="border-bottom:none;">
-            <div class="settings-label">Chunk Size</div>
-            <div class="settings-row"><span id="chunk-label">512 tokens</span></div>
-            <input type="range" min="128" max="1024" step="128" value="512" style="width:100%;margin-top:6px;" oninput="document.getElementById('chunk-label').textContent=this.value+' tokens'" />
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<script>
-var queries = [];
-var qCount = 0;
-
-function showPage(p) {
-  ['dashboard','query','documents','settings'].forEach(function(id) {
-    document.getElementById('page-'+id).style.display = id===p ? '' : 'none';
-    var nav = document.getElementById('nav-'+id);
-    if(nav) nav.className = id===p ? 'active' : '';
-  });
-}
-
-function switchProfile(code, name, color) {
-  document.querySelectorAll('.dept-btn').forEach(function(b){ b.classList.remove('active'); });
-  var map = {ED:'ed',FN:'fn',AD:'ad',QX:'qx',IC:'ic',SG:'sg'};
-  var el = document.querySelector('.dept-btn.'+map[code]);
-  if(el) el.classList.add('active');
-  document.getElementById('badge-initials').textContent = code;
-  document.getElementById('badge-initials').style.background = color;
-  document.getElementById('badge-name').textContent = name;
-  document.getElementById('active-profile-name').textContent = name;
-}
-
-function runQuery() {
-  var input = document.getElementById('query-input');
-  var text = input.value.trim();
-  if(!text) return;
-  qCount++;
-  queries.unshift({text: text, time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})});
-  input.value = '';
-  document.getElementById('stat-queries').textContent = qCount;
-  var conf = Math.floor(75 + Math.random()*20);
-  document.getElementById('stat-conf').textContent = conf + '%';
-  var hp = document.getElementById('query-history-panel');
-  var empty = document.getElementById('query-empty');
-  if(empty) empty.style.display = 'none';
-  var div = document.createElement('div');
-  div.className = 'query-item';
-  div.innerHTML = '<span style="flex:1;margin-right:12px;">' + text.substring(0,60) + (text.length>60?'…':'') + '</span><span class="query-badge">' + conf + '% conf</span>';
-  hp.appendChild(div);
-  var rl = document.getElementById('recent-queries-list');
-  rl.innerHTML = '';
-  var panel = document.createElement('div');
-  panel.className = 'content-panel';
-  queries.slice(0,3).forEach(function(q){
-    var d = document.createElement('div');
-    d.className = 'query-item';
-    d.innerHTML = '<span style="flex:1">' + q.text.substring(0,50) + (q.text.length>50?'…':'') + '</span><span class="query-badge">' + q.time + '</span>';
-    panel.appendChild(d);
-  });
-  rl.appendChild(panel);
-}
-</script>
-"""
-
-components.html(html_content, height=700, scrolling=True)
+if page == "dashboard":
+    from pages.pg_dashboard import render
+    render(_vs)
+elif page == "query":
+    from pages.pg_query import render
+    render(_vs, _chain, api_key)
+elif page == "documents":
+    from pages.pg_documents import render
+    render()
+elif page == "settings":
+    from pages.pg_settings import render
+    render()
